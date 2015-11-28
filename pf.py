@@ -90,6 +90,9 @@ class ParticleFilter(object):
       particle = Particle(self._bmap.num_cols, self._bmap.num_rows)
       self.particles.append(particle)
     self._frame = 0
+    self.predicted_x = self._bmap.num_cols / 2
+    self.predicted_y = self._bmap.num_rows / 2
+    self.predicted_theta = 0
 
   def update(self):
     """Updates the particle filter by one interation.
@@ -103,6 +106,7 @@ class ParticleFilter(object):
     max_weight = self._update_weights()
     weight_sum = self._normalize_weights(max_weight)
     self._resample(weight_sum)
+    self._estimate_location()
     self._frame += 1
 
   def _move_particles(self, amount):
@@ -180,3 +184,25 @@ class ParticleFilter(object):
         weight_pos -= selection.weight
       new_particles.append(selection.clone())
     self.particles = new_particles
+
+  def _estimate_location(self):
+    """Uses the current particle to estimate the location and heading.
+
+    The location and heading is computed as the weighted average of all
+    particles.
+    """
+    # TODO: we should also do some connected-components clustering to make the
+    # particles predict more than 1 location where applicable.
+    total_weight = 0
+    total_x = 0
+    total_y = 0
+    total_theta = 0
+    for particle in self.particles:
+      total_weight += particle.weight
+      total_x += particle.weight * particle.x
+      total_y += particle.weight * particle.y
+      total_theta += particle.weight * particle.theta
+    self.predicted_x = int(total_x / total_weight)
+    self.predicted_y = int(total_y / total_weight)
+    self.predicted_theta = total_theta / total_weight
+

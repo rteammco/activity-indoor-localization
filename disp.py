@@ -16,7 +16,10 @@ class DisplayWindow():
   """
 
   # Display settings.
+  _PARTICLE_COLOR = 'yellow'
   _PARTICLE_RADIUS = 5
+  _ESTIMATE_COLOR = 'purple'
+  _ESTIMATE_RADIUS = 30
   _UPDATE_INTERVAL_MS = 500
 
   def __init__(self, pf, building_map, map_img_name):
@@ -85,13 +88,31 @@ class DisplayWindow():
       y1 = particle.y - r / 2
       x2 = x1 + r
       y2 = y1 + r
-      self._canvas.create_oval(x1, y1, x2, y2, fill='yellow')
+      self._canvas.create_oval(x1, y1, x2, y2, fill=self._PARTICLE_COLOR)
       # Draw an arrow to indicate the particle's orientation.
       c_x = (x2 + x1) / 2
       c_y = (y2 + y1) / 2
       end_x = c_x + r * math.cos(particle.theta)
       end_y = c_y + r * math.sin(particle.theta)
-      self._canvas.create_line(c_x, c_y, end_x, end_y, fill='yellow')
+      self._canvas.create_line(
+          c_x, c_y, end_x, end_y, fill=self._PARTICLE_COLOR)
+    # Draw the particle filter's estimated location.
+    half_r = self._ESTIMATE_RADIUS / 2
+    thickness = self._ESTIMATE_RADIUS / 8 + 1
+    self._canvas.create_oval(
+        self._pf.predicted_x-half_r, self._pf.predicted_y-half_r,
+        self._pf.predicted_x+half_r, self._pf.predicted_y+half_r,
+        outline=self._ESTIMATE_COLOR, width=thickness)
+    # Draw the estimated orientation over the estimated location.
+    costheta = math.cos(self._pf.predicted_theta)
+    sintheta = math.sin(self._pf.predicted_theta)
+    start_x = self._pf.predicted_x + half_r * costheta
+    start_y = self._pf.predicted_y + half_r * sintheta
+    end_x = start_x + self._ESTIMATE_RADIUS * costheta
+    end_y = start_y + self._ESTIMATE_RADIUS * sintheta
+    self._canvas.create_line(
+        start_x, start_y, end_x, end_y,
+        fill=self._ESTIMATE_COLOR, width=thickness)
 
 
 if __name__ == '__main__':
