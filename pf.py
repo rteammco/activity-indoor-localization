@@ -11,10 +11,10 @@ class PFConfig(object):
   Populate with config file.
   """
   NUM_PARTICLES = 100
+  PARTICLE_MOVE_SPEED = 5
   RANDOM_WALK_FREQUENCY = 5
-  RANDOM_WALK_MAX = 10
-  WINDOW_WIDTH = 100
-  WINDOW_HEIGHT = 100
+  RANDOM_WALK_MAX_DIST = 10
+  RANDOM_WALK_MAX_THETA = math.pi / 4
 
 
 class Particle(object):
@@ -23,27 +23,22 @@ class Particle(object):
   TODO
   """
 
-  def __init__(self):
-    self.x = 0
-    self.y = 0
+  def __init__(self, max_width=10, max_height=10):
+    """Initializes a new, randomly positioned particle with weight = 1.
+    """
+    self.x = random.randint(1, max_width)
+    self.y = random.randint(1, max_height)
+    self.theta = random.random() * 2 * math.pi
     self.weight = 1.0
 
-  def randomize(self):
-    self.x = random.randint(1, 500) # max map width
-    self.y = random.randint(1, 500) # max map height
-
-  def degrade(self, scale):
-    """Degrades the weight of this particle by the scale.
+  def move_by(self, amount):
+    """Moves the particle by the given amount in its oriented direction.
 
     Args:
-      scale: a number between 0 and 1 (exclusive) that will be multiplied with
-          this particle's current weight to reduce its weight.
+      amount: the amount that the particle will be moved by.
     """
-    # Allow only a valid scale range. Otherwise return.
-    if scale < 0 or scale > 1:
-      log_error('scale = {} is invalid'.format(scale))
-      return
-    self.weight *= scale
+    self.x += amount * math.cos(self.theta)
+    self.y += amount * math.sin(self.theta)
 
   def clone(self):
     """Clones this particle and returns an exact copy.
@@ -54,6 +49,7 @@ class Particle(object):
     new_particle = Particle()
     new_particle.x = self.x
     new_particle.y = self.y
+    new_particle.theta = self.theta
     new_particle.weight = self.weight
     return new_particle
 
@@ -62,25 +58,27 @@ class ParticleFilter(object):
   """ TODO
   """
 
-  def __init__(self, config):
+  def __init__(self, config, building_map):
     """???
 
     Args:
       config: a PFConfig object containing the particle filter configuration
           values.
+      building_map: a BuildingMap object.
     """
     self._config = config
+    self._bmap = building_map
     self.particles = []
     for i in range(self._config.NUM_PARTICLES):
-      particle = Particle()
-      particle.randomize() # TODO: randomize with respect to the map!
+      particle = Particle(self._bmap.num_cols, self._bmap.num_rows)
       self.particles.append(particle)
     self._frame = 0
 
   def update(self):
     """Updates the particle filter by one interation.
     """
-    # TODO: update agent movement.
+    if True: # TODO: only move particles if user is supposedly moving!
+      self._move_particles(self._config.PARTICLE_MOVE_SPEED)
     if self._config.RANDOM_WALK_FREQUENCY != 0 and (
         self._frame % self._config.RANDOM_WALK_FREQUENCY) == 0:
       self._random_walk()
@@ -89,17 +87,26 @@ class ParticleFilter(object):
     self._resample(weight_sum)
     self._frame += 1
 
+  def _move_particles(self, amount):
+    """Moves the particles forward by the given amount.
+    """
+    for particle in self.particles:
+      particle.move_by(amount)
+
   def _random_walk(self):
     """Randomly offset the particles by some amount in each axis.
     
     This random walk forces the particle to "explore" new areas.
     """
-    half = self._config.RANDOM_WALK_MAX / 2
+    half_dist = self._config.RANDOM_WALK_MAX_DIST / 2
+    half_theta = self._config.RANDOM_WALK_MAX_THETA / 2
     for particle in self.particles:
-      dx = random.randint(0, self._config.RANDOM_WALK_MAX) - half
-      dy = random.randint(0, self._config.RANDOM_WALK_MAX) - half
+      dx = random.randint(0, self._config.RANDOM_WALK_MAX_DIST) - half_dist
+      dy = random.randint(0, self._config.RANDOM_WALK_MAX_DIST) - half_dist
+      dtheta = random.random() * self._config.RANDOM_WALK_MAX_THETA - half_theta
       particle.x += dx
       particle.y += dy
+      particle.theta += dtheta
 
   def _update_weights(self):
     """Estimate the weights of each particle based on the current map.
@@ -107,7 +114,11 @@ class ParticleFilter(object):
     Returns:
       The maximum weight of all particles.
     """
-    max_weight = 1
+    max_weight = 0
+    for particle in self.particles:
+      weight = self._bmap.probability_of(int(particle.x), int(particle.y))
+      particle.weight *= weight
+      max_weight = max(max_weight, weight)
     return max_weight
 
   def _normalize_weights(self, max_weight):
