@@ -1,4 +1,6 @@
 
 
 class Map():
-  pass
+
+  def __init__(self, map_file_name):
+    pass
