@@ -38,7 +38,7 @@ class Particle(object):
     """
     # Allow only a valid scale range. Otherwise return.
     if scale < 0 or scale > 1:
-      log_error("Failed scale.")
+      log_error('scale = {} is invalid'.format(scale))
       return
     self.weight *= scale
 
@@ -92,7 +92,8 @@ class ParticleFilter(object):
     Args:
       max_weight: the maximum weight of any particle in the set.
     """
-    if self.max_weight <= 0:
+    if max_weight <= 0:
+      log_error('max_weight = {} is invalid'.format(max_weight))
       return
     for particle in self._particles:
       particle.weight /= max_weight
