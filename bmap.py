@@ -6,10 +6,13 @@ class BuildingMap():
   """
 
   # Region defintions by ID (this must be the same as in the file).
-  NUMBER_OF_REGIONS = 3
+  NUMBER_OF_REGIONS = 6
   VOID_SPACE = 0
   HALLWAY = 1
   STAIRCASE = 2
+  ELEVATOR = 3
+  DOOR = 4
+  SITTING_AREA = 5
 
   def __init__(self, map_file_name):
     """Reads the given file and formats the data for the bitmap.

@@ -1,7 +1,10 @@
 % Define constant bit map values.
-WALL = 0;
+VOID_SPACE = 0;
 HALLWAY = 1;
 STAIRCASE = 2;
+ELEVATOR = 3;
+DOOR = 4;
+SITTING_AREA = 5;
 
 [h, w, ~] = size(img);
 bitmap = zeros(h, w);
