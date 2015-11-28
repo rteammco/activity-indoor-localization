@@ -96,6 +96,7 @@ class ParticleFilter(object):
     """
     if True: # TODO: only move particles if user is supposedly moving!
       self._move_particles(self._config.PARTICLE_MOVE_SPEED)
+    # TODO: if the user "turn" is detected, add that here too!
     if self._config.RANDOM_WALK_FREQUENCY != 0 and (
         self._frame % self._config.RANDOM_WALK_FREQUENCY) == 0:
       self._random_walk()

@@ -8,12 +8,31 @@ from pf import ParticleFilter, PFConfig
 
 
 class DisplayWindow():
+  """The GUI window that displays all particles and controls the timers.
+
+  This class manages displaying all particles and the map image. It also calls
+  the update for the map and particle filter periodically to simulate the
+  localization process.
+  """
 
   # Display settings.
   _PARTICLE_RADIUS = 5
   _UPDATE_INTERVAL_MS = 500
 
   def __init__(self, pf, building_map, map_img_name):
+    """Initializes the displayed window and the canvas to draw with.
+
+    Args:
+      pf: a ParticleFilter object with all parameters set up. This object's
+          update() function will be called every frame, and its particles will
+          be used to visualize the map state.
+      building_map: a BuildingMap object that contains the region definitions
+          (bitmap) as well as the probabilities for each region. This will also
+          be updated every frame.
+      map_img_name: the name (directory path) of the background map image that
+          will be displayed in the background. This must be a .gif file with the
+          image of the building map.
+    """
     self._pf = pf
     self._bmap = building_map
     self._main_window = Tk.Tk()
@@ -33,11 +52,13 @@ class DisplayWindow():
       self._background_img = None
 
   def start(self):
+    """Starts the update process and initializes the window's main loop.
+    """
     self._update()
     self._main_window.mainloop()
 
   def _update(self):
-    """Update the particle filter and render the screen.
+    """Update the particle filter and map and render the visualizations.
 
     Also queues the next update after _UPDATE_INTERVAL_MS miliseconds.
     """
@@ -46,7 +67,7 @@ class DisplayWindow():
     self._main_window.after(self._UPDATE_INTERVAL_MS, self._update)
 
   def _render(self):
-    """Renders the map and the particles.
+    """Draws the map image and all of the particles to the screen.
     """
     self._canvas.delete('all')
     # Draw the map.
