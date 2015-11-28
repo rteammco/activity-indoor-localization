@@ -7,8 +7,8 @@ from errlog import log_error
 class PFConfig(object):
   """A configuration object for the particle filter.
   
-  This configuration object contains... TODO
-  Populate with config file.
+  This configuration object contains particle filter parameters that should be
+  set up and passed to the ParticleFilter object during construction.
   """
   NUM_PARTICLES = 100
   PARTICLE_MOVE_SPEED = 5
@@ -20,14 +20,24 @@ class PFConfig(object):
 class Particle(object):
   """A single particle.
 
-  TODO
+  Initializes at a random position and orientation, and adds functionality to
+  move along its oriented direction, and the ability to clone itself for the
+  particle filter.
   """
 
-  def __init__(self, max_width=10, max_height=10):
+  def __init__(self, map_width=10, map_height=10):
     """Initializes a new, randomly positioned particle with weight = 1.
+
+    Pass in the parameters for the map width and height to randomly position
+    the particle somewhere on the map. No need to pass in these parameters when
+    cloning the particle, since the cloned copy will get the same values.
+
+    Args:
+      map_width: (optional) the width of the map being used.
+      map_height: (optional) the height of the map being used.
     """
-    self.x = random.randint(1, max_width)
-    self.y = random.randint(1, max_height)
+    self.x = random.randint(1, map_width)
+    self.y = random.randint(1, map_height)
     self.theta = random.random() * 2 * math.pi
     self.weight = 1.0
 
@@ -55,16 +65,23 @@ class Particle(object):
 
 
 class ParticleFilter(object):
-  """ TODO
+  """ The particle filter implementation for the map.
+
+  Provides basic particle filter functionality by moving particles, resampling,
+  updaing their positions, and setting their probabilities based on the current
+  map state.
   """
 
   def __init__(self, config, building_map):
-    """???
+    """Initialize the particle filter parameters and all of the particles.
+
+    All particles are initially placed in random positions.
 
     Args:
       config: a PFConfig object containing the particle filter configuration
           values.
-      building_map: a BuildingMap object.
+      building_map: a BuildingMap object that will be referenced to update
+          particle probabilities during updates.
     """
     self._config = config
     self._bmap = building_map
@@ -88,7 +105,9 @@ class ParticleFilter(object):
     self._frame += 1
 
   def _move_particles(self, amount):
-    """Moves the particles forward by the given amount.
+    """Moves all particles forward by the given amount.
+
+    The direction of movement depends on each particle's orientation.
     """
     for particle in self.particles:
       particle.move_by(amount)
