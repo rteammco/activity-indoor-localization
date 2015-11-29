@@ -20,7 +20,8 @@ class DisplayWindow():
   _ESTIMATE_RADIUS = 30
   _UPDATE_INTERVAL_MS = 500
 
-  def __init__(self, pf, building_map, feed_file_name, map_img_name):
+  def __init__(self, pf, building_map, feed_file_name, map_img_name,
+               loop_feed=True):
     """Initializes the displayed window and the canvas to draw with.
 
     Args:
@@ -50,7 +51,7 @@ class DisplayWindow():
     # Try to load the lcassifier feed file.
     self._classifier_feed = self._process_feed_file(feed_file_name)
     self._next_feed_index = 0
-    self._feed_looping = True # TODO: parameter
+    self._feed_looping = loop_feed
     # Try to load the background map image.
     try:
       self._background_img = Tk.PhotoImage(file=map_img_name)

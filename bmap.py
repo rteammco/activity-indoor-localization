@@ -30,7 +30,7 @@ class BuildingMap():
       self._map_data = map_file.readlines()
     except:
       self._map_data = []
-      log_error('failed reading file: {}'.format(map_file_name))
+      log_error('failed reading file: {}'.format(map_file_name), terminate=True)
     # Process the map data into a 2D grid.
     self.num_rows = len(self._map_data)
     for i in range(len(self._map_data)):

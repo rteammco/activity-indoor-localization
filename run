@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python run.py --feed Data/test_feed.txt --map-data Data/map.txt --map-image Data/3ne.gif
