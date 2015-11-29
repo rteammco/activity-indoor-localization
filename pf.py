@@ -11,6 +11,7 @@ class PFConfig(object):
   set up and passed to the ParticleFilter object during construction.
   """
   NUM_PARTICLES = 100
+  UPDATES_PER_FRAME = 1
   PARTICLE_MOVE_SPEED = 5
   RANDOM_WALK_FREQUENCY = 5
   RANDOM_WALK_MAX_DIST = 10
@@ -95,19 +96,23 @@ class ParticleFilter(object):
     self.predicted_theta = 0
 
   def update(self):
-    """Updates the particle filter by one interation.
+    """Updates the particle filter by one or more interation.
+
+    Repeats multiple times if the given PFConfig specifies more updates per
+    single frame interation.
     """
-    if True: # TODO: only move particles if user is supposedly moving!
-      self._move_particles(self._config.PARTICLE_MOVE_SPEED)
-    # TODO: if the user "turn" is detected, add that here too!
-    if self._config.RANDOM_WALK_FREQUENCY != 0 and (
-        self._frame % self._config.RANDOM_WALK_FREQUENCY) == 0:
-      self._random_walk()
-    max_weight = self._update_weights()
-    weight_sum = self._normalize_weights(max_weight)
-    self._resample(weight_sum)
-    self._estimate_location()
-    self._frame += 1
+    for i in range(self._config.UPDATES_PER_FRAME):
+      if True: # TODO: only move particles if user is supposedly moving!
+        self._move_particles(self._config.PARTICLE_MOVE_SPEED)
+      # TODO: if the user "turn" is detected, add that here too!
+      if self._config.RANDOM_WALK_FREQUENCY != 0 and (
+          self._frame % self._config.RANDOM_WALK_FREQUENCY) == 0:
+        self._random_walk()
+      max_weight = self._update_weights()
+      weight_sum = self._normalize_weights(max_weight)
+      self._resample(weight_sum)
+      self._estimate_location()
+      self._frame += 1
 
   def _move_particles(self, amount):
     """Moves all particles forward by the given amount.

@@ -6,13 +6,14 @@ class BuildingMap():
   """
 
   # Region defintions by ID (this must be the same as in the file).
-  NUMBER_OF_REGIONS = 6
+  NUMBER_OF_REGIONS = 7
   VOID_SPACE = 0
   HALLWAY = 1
   STAIRCASE = 2
   ELEVATOR = 3
   DOOR = 4
   SITTING_AREA = 5
+  STANDING_AREA = 6
 
   def __init__(self, map_file_name):
     """Reads the given file and formats the data for the bitmap.
@@ -39,7 +40,7 @@ class BuildingMap():
     self.num_cols = len(self._map_data[0]) if self.num_rows > 0 else 0
     # Initialize all region probabilities to 1 (except void space).
     self._region_probs = [1.0] * self.NUMBER_OF_REGIONS
-    self._region_probs[self.VOID_SPACE] = 0.01
+    self._region_probs[self.VOID_SPACE] = 0.0
 
   def probability_of(self, x, y):
     """Returns the probability at region x, y.
@@ -58,10 +59,21 @@ class BuildingMap():
     region = self._map_data[y][x]
     return self._region_probs[region]
 
-  def set_probabilities(self, prob_map):
-    """Sets the probabilities of each region."""
-    # TODO
-    pass
+  def set_probabilities(self, probabilities):
+    """Sets the probabilities of each region.
+
+    Args:
+      probabilities: the probability weights for each of the classes. This
+          should be a list of NUMBER_OF_REGIONS-1 values between 0 and 1, and
+          ideally the total sum of these values should equal to 1. Do not pass
+          in the probability of the void region (assumed to always be 0).
+    """
+    if len(probabilities) != (self.NUMBER_OF_REGIONS - 1):
+      log_error('given number of probabilities does not equal {}'.format(
+          self.NUMBER_OF_REGIONS - 1))
+      return
+    for i in range(1, self.NUMBER_OF_REGIONS):
+      self._region_probs[i] = probabilities[i-1]
 
 
 if __name__ == '__main__':
