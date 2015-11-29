@@ -37,9 +37,12 @@ def get_pf_config(config_file=None):
     try:
       f = open(config_file, 'r')
       for line in f:
-        line = map(str.strip, line.split('='))
-        if len(line) == 2:
-          config_values[line[0]] = eval(line[1])
+        line = line.strip()
+        if line:
+          line = line.split('=')
+          line = map(str.strip, line)
+          if len(line) == 2:
+            config_values[line[0]] = eval(line[1])
     except:
       log_error('failed reading or parsing config file: {}'.format(config_file))
   config = PFConfig()
