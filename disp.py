@@ -164,11 +164,11 @@ if __name__ == '__main__':
   """
   # Configure the particle filter:
   config = PFConfig()
-  config.NUM_PARTICLES = 1000
+  config.NUM_PARTICLES = 2000
   config.UPDATES_PER_FRAME = 1
   config.PARTICLE_MOVE_SPEED = 5
-  config.RANDOM_WALK_FREQUENCY = 5
-  config.RANDOM_WALK_MAX_DIST = 40
+  config.RANDOM_WALK_FREQUENCY = 3
+  config.RANDOM_WALK_MAX_DIST = 80
   config.RANDOM_WALK_MAX_THETA = math.pi / 4
   # Start the simulation.
   print 'Starting...'
