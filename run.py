@@ -4,6 +4,7 @@ import math
 from bmap import BuildingMap
 from disp import DisplayWindow
 from errlog import log_error
+from feed_processor import FeedProcessor
 from pf import ParticleFilter, PFConfig
 
 
@@ -77,10 +78,10 @@ if __name__ == '__main__':
       help='Set this flag to loop the input feed after it finishes.')
   args = parser.parse_args()
   config = get_pf_config(args.config_file)
-  # Configure the particle filter:
   # Start the simulation.
   building_map = BuildingMap(args.map_data)
   pf = ParticleFilter(config, building_map)
   loop_feed = True if args.loop_feed else False
-  w = DisplayWindow(pf, building_map, args.feed, args.map_image, loop_feed)
+  feed_processor = FeedProcessor(args.feed, loop_feed)
+  w = DisplayWindow(pf, building_map, feed_processor, args.map_image, loop_feed)
   w.start()

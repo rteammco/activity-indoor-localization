@@ -20,7 +20,7 @@ class DisplayWindow():
   _ESTIMATE_RADIUS = 30
   _UPDATE_INTERVAL_MS = 500
 
-  def __init__(self, pf, building_map, feed_file_name, map_img_name,
+  def __init__(self, pf, building_map, feed_processor, map_img_name,
                loop_feed=True):
     """Initializes the displayed window and the canvas to draw with.
 
@@ -31,59 +31,27 @@ class DisplayWindow():
       building_map: a BuildingMap object that contains the region definitions
           (bitmap) as well as the probabilities for each region. This will also
           be updated every frame.
-      feed_file_name: the name of the file that contains all probabilities for
-          each of the activities. Empty lines or lines starting with '#' will be
-          ignored. All other lines should have a series of space-delimited
-          probability values, one for each region class, in the same order as
-          defined in the BuildingMap class.
+      feed_processor: a FeedProcessor object that contains a classifier data
+          feed from which to update the map and particle filter motion from.
       map_img_name: the name (directory path) of the background map image that
           will be displayed in the background. This must be a .gif file with the
           image of the building map.
     """
     self._pf = pf
     self._bmap = building_map
+    self._feed_processor = feed_processor
     self._main_window = Tk.Tk()
     self._main_window.title('Particle Filter')
     self._canvas = Tk.Canvas(
         self._main_window, width=self._bmap.num_cols,
         height=self._bmap.num_rows, background='white')
     self._canvas.pack()
-    # Try to load the lcassifier feed file.
-    self._classifier_feed = self._process_feed_file(feed_file_name)
-    self._next_feed_index = 0
-    self._feed_looping = loop_feed
     # Try to load the background map image.
     try:
       self._background_img = Tk.PhotoImage(file=map_img_name)
     except:
       log_error('failed to load image: {}'.format(map_img_name))
       self._background_img = None
-
-  def _process_feed_file(self, feed_file_name):
-    """Reads the given filename and tries to parse the classifier feed.
-    
-    Args:
-      feed_file_name: the name of the text file that contains the classified
-          feed confidence values for each region class (the probabilities in
-          plain text).
-    
-    Returns:
-      A 2D list floats that contains the probabilities for each region for every
-      iteration interval (frame). These probabilities are intended to be given
-      one at a time to the BuildingMap object to update its region probabilites.
-    """
-    probability_list = []
-    try:
-      f = open(feed_file_name, 'r')
-      for line in f:
-        line = line.strip()
-        if len(line) == 0 or line.startswith('#'):
-          continue
-        line = line.split()
-        probability_list.append(map(float, line))
-    except:
-      log_error('failed to load feed file: {}'.format(feed_file_name))
-    return probability_list
 
   def start(self):
     """Starts the update process and initializes the window's main loop.
@@ -94,16 +62,12 @@ class DisplayWindow():
   def _update(self):
     """Update the particle filter and map and render the visualizations.
 
-    Also queues the next update after _UPDATE_INTERVAL_MS miliseconds.
+    Also queues the next update after _UPDATE_INTERVAL_MS miliseconds. All
+    updates happen here to all components of the particle filter program.
     """
-    # Update map probabilities if there is a feed.
-    num_feeds = len(self._classifier_feed)
-    if num_feeds > self._next_feed_index:
-      self._bmap.set_probabilities(self._classifier_feed[self._next_feed_index])
-      self._next_feed_index += 1
-      # If index is out of bounds, reset if we are looping the classifier feed.
-      if self._next_feed_index >= num_feeds and self._feed_looping:
-        self._next_feed_index = 0
+    if self._feed_processor.has_next():
+      probabilities, turn_angle = self._feed_processor.get_next()
+      self._bmap.set_probabilities(probabilities)
     print self._bmap._region_probs # TODO: visualize this somehow instead
     # Update particle filter and render everything until the next frame.
     self._pf.update()

@@ -95,16 +95,24 @@ class ParticleFilter(object):
     self.predicted_y = self._bmap.num_rows / 2
     self.predicted_theta = 0
 
-  def update(self):
+  def update(self, user_moving=True, turn_angle=0):
     """Updates the particle filter by one or more interation.
 
     Repeats multiple times if the given PFConfig specifies more updates per
     single frame interation.
+
+    Args:
+      user_moving: if the user is moving, this should be True (as by default).
+          If the user is not moving, set this to False. The user's movement can
+          be determined by analyzing the motion data.
+      turn_angle: the user's turning angle. If a value is provided, the theta
+          for particles will be incremented by that amount.
     """
     for i in range(self._config.UPDATES_PER_FRAME):
-      if True: # TODO: only move particles if user is supposedly moving!
+      if user_moving: # TODO: provide a movement speed (or multiplier).
         self._move_particles(self._config.PARTICLE_MOVE_SPEED)
-      # TODO: if the user "turn" is detected, add that here too!
+      if turn_angle != 0:
+        self._turn_particles(turn_angle)
       if self._config.RANDOM_WALK_FREQUENCY != 0 and (
           self._frame % self._config.RANDOM_WALK_FREQUENCY) == 0:
         self._random_walk()
@@ -118,9 +126,21 @@ class ParticleFilter(object):
     """Moves all particles forward by the given amount.
 
     The direction of movement depends on each particle's orientation.
+
+    Args:
+      amount: the distance by which all particles will be moved forward.
     """
     for particle in self.particles:
       particle.move_by(amount)
+
+  def _turn_particles(self, angle):
+    """Updates the angle of all particles by the given amount.
+
+    Args:
+      angle: the angle that will be added to each particle's theta.
+    """
+    for particle in self.particles:
+      particle.theta += angle
 
   def _random_walk(self):
     """Randomly offset the particles by some amount in each axis.
