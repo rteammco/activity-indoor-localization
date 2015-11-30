@@ -136,11 +136,15 @@ class ParticleFilter(object):
   def _turn_particles(self, angle):
     """Updates the angle of all particles by the given amount.
 
+    Adds or subtracts the given angle from each particle (randomly).
+
     Args:
-      angle: the angle that will be added to each particle's theta.
+      angle: the angle that will be added to or subtracted from each
+          particle's theta.
     """
     for particle in self.particles:
-      particle.theta += angle
+      sign = random.randint(0, 1) * 2 - 1
+      particle.theta += angle * sign
 
   def _random_walk(self):
     """Randomly offset the particles by some amount in each axis.

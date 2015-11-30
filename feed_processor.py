@@ -13,7 +13,9 @@ class FeedProcessor(object):
           each of the activities. Empty lines or lines starting with '#' will be
           ignored. All other lines should have a series of space-delimited
           probability values, one for each region class, in the same order as
-          defined in the BuildingMap class.
+          defined in the BuildingMap class. A line can also start with a '+', in
+          which case the turn angle for the step associated with the
+          probabilities of the line above it will be updated.
       loop_feed: (optional) set to False if this feed shouldn't loop around.
           Otherwise, when the data stream runs out, it will loop from the
           beginning.
@@ -24,6 +26,7 @@ class FeedProcessor(object):
       one at a time to the BuildingMap object to update its region probabilites.
     """
     self._probability_list = []
+    self._turn_angles = []
     self._loop_feed = loop_feed
     try:
       f = open(feed_file_name, 'r')
@@ -31,8 +34,19 @@ class FeedProcessor(object):
         line = line.strip()
         if len(line) == 0 or line.startswith('#'):
           continue
-        line = line.split()
-        self._probability_list.append(map(float, line))
+        # If line begins with a '+', that means it's a turn angle, so add that
+        # turn value to the previous position.
+        if line.startswith('+'):
+          line = line[1:]
+          line = line.strip()
+          turn_angle = float(line)
+          if len(self._turn_angles) > 0:
+            self._turn_angles[-1] = turn_angle
+        # Otherwise add the probabilities and a turn angle of 0.
+        else:
+          line = line.split()
+          self._probability_list.append(map(float, line))
+          self._turn_angles.append(0)
     except:
       log_error('failed to load feed file: {}'.format(feed_file_name))
     self._next_index = 0
@@ -64,6 +78,7 @@ class FeedProcessor(object):
     turn_angle = 0
     if self._num_feeds > self._next_index:
       probs = self._probability_list[self._next_index]
+      turn_angle = self._turn_angles[self._next_index]
       self._next_index += 1
       # If index is out of bounds, reset if we are looping the classifier feed.
       if self._next_index >= self._num_feeds and self._loop_feed:

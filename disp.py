@@ -65,12 +65,13 @@ class DisplayWindow():
     Also queues the next update after _UPDATE_INTERVAL_MS miliseconds. All
     updates happen here to all components of the particle filter program.
     """
-    if self._feed_processor.has_next():
-      probabilities, turn_angle = self._feed_processor.get_next()
+    probabilities, turn_angle = self._feed_processor.get_next()
+    if probabilities is not None:
       self._bmap.set_probabilities(probabilities)
-    print self._bmap._region_probs # TODO: visualize this somehow instead
+    # TODO: visualize this somehow instead of printing...
+    print '{} {}'.format(self._bmap._region_probs, turn_angle)
     # Update particle filter and render everything until the next frame.
-    self._pf.update()
+    self._pf.update(turn_angle=turn_angle)
     self._render()
     self._main_window.after(self._UPDATE_INTERVAL_MS, self._update)
 
