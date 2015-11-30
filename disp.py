@@ -68,15 +68,16 @@ class DisplayWindow():
     probabilities, turn_angle = self._feed_processor.get_next()
     if probabilities is not None:
       self._bmap.set_probabilities(probabilities)
-    # TODO: visualize this somehow instead of printing...
-    print '{} {}'.format(self._bmap._region_probs, turn_angle)
     # Update particle filter and render everything until the next frame.
     self._pf.update(turn_angle=turn_angle)
-    self._render()
+    self._render(turn_angle)
     self._main_window.after(self._UPDATE_INTERVAL_MS, self._update)
 
-  def _render(self):
+  def _render(self, turn_angle):
     """Draws the map image and all of the particles to the screen.
+
+    Args:
+      turn_angle: the turning angle (will be displayed for visualization).
     """
     self._canvas.delete('all')
     # Draw the map.
@@ -119,3 +120,26 @@ class DisplayWindow():
     self._canvas.create_line(
         start_x, start_y, end_x, end_y,
         fill=self._ESTIMATE_COLOR, width=thickness)
+    # Draw the probabilities and current max estimate.
+    # TODO: don't hard-code the locations here!
+    text_y = self._bmap.num_rows - 50
+    text_x = self._bmap.num_cols / 2
+    max_index = self._bmap.region_probs.index(max(self._bmap.region_probs)) - 1
+    regions = ['hall', 'stairs', 'elevator', 'door', 'sit', 'stand']
+    font = ('Arial', 22)
+    padding = 100
+    for i in range(6):
+      name = regions[i]
+      prob = str(round(self._bmap.region_probs[i+1], 3))
+      x = text_x - (padding * (i - 2.5))
+      if i == max_index:
+        color = 'yellow'
+      else:
+        color = 'red'
+      self._canvas.create_text(x, text_y, font=font, text=name, fill=color)
+      self._canvas.create_text(x, text_y + 25, font=font, text=prob, fill=color)
+    if turn_angle != 0:
+      turn_angle = 'TURNING: ' + str(round(turn_angle, 3))
+      turn_x = text_x + padding * 4
+      self._canvas.create_text(
+          turn_x, text_y + 12, font=font, text=turn_angle, fill='green')

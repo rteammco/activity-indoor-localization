@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python run.py --config Data/pf_config.txt --feed Data/test_feed.txt --loop-feed --map-data Data/map.txt --map-image Data/3ne.gif
+python run.py --config Data/pf_config.txt --feed Data/test_feed2.txt --map-data Data/map.txt --map-image Data/3ne.gif

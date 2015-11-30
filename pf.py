@@ -16,6 +16,7 @@ class PFConfig(object):
   RANDOM_WALK_FREQUENCY = 5
   RANDOM_WALK_MAX_DIST = 10
   RANDOM_WALK_MAX_THETA = math.pi / 4
+  WEIGHT_DECAY_RATE = 1.0
 
 
 class Particle(object):
@@ -170,6 +171,7 @@ class ParticleFilter(object):
     max_weight = 0
     for particle in self.particles:
       weight = self._bmap.probability_of(int(particle.x), int(particle.y))
+      weight += ((1 - weight) * (1 - self._config.WEIGHT_DECAY_RATE))
       particle.weight *= weight
       max_weight = max(max_weight, weight)
     return max_weight

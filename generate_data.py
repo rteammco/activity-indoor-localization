@@ -46,22 +46,33 @@ if __name__ == '__main__':
   print '\nEnter one action per line (0.5 seconds per line).\n'
   prob_list = []
   action = raw_input()
-  prev_action = action
+  prev_action = ''
   while action:
-    action, count = process_request(action)
-    if action.lower() in actions:
-      if action != prev_action:
-        prob_list.append('# ' + action)
-        prev_action = action
-      for i in range(count):
-        probs = get_probabilities(
-            actions[action], len(actions), random.random() * noise)
-        prob_list.append(' '.join(map(str, probs)))
+    # If a +, append the + angle value.
+    if action.startswith('+'):
+      prob_list.append(action)
+    # Otherwise, randomize the probabilities normally.
     else:
-      print '"{}" is not a valid action.'.format(action)
+      action, count = process_request(action)
+      if action.lower() in actions:
+        if action != prev_action:
+          prob_list.append('# ' + action)
+          prev_action = action
+        for i in range(count):
+          probs = get_probabilities(
+              actions[action], len(actions), random.triangular(0, 1) * noise)
+          prob_list.append(' '.join(map(str, probs)))
+      else:
+        print '"{}" is not a valid action.'.format(action)
     action = raw_input()
   outfile = raw_input('Output file name: ')
-  f = open(outfile, 'w')
-  for p in prob_list:
-    f.write(p + '\n')
-  f.close()
+  if not outfile:
+    print 'No output file provided. Printing.'
+    for p in prob_list:
+      print p
+  else:
+    f = open(outfile, 'w')
+    for p in prob_list:
+      f.write(p + '\n')
+    f.close()
+    print 'Wrote output to file: "{}".'.format(outfile)
