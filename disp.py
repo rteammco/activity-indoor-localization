@@ -62,14 +62,45 @@ class DisplayWindow():
     self._user_sim_x = self._bmap.num_cols / 2
     self._user_sim_y = self._bmap.num_rows / 2
     self._user_sim_theta = 0
+    self._mouse_x = 0
+    self._mouse_y = 0
+    self._mouse_down = False
 
   def start_make_feed(self):
     """
     """
     self._main_window.bind('<KeyPress>', self._key_press)
     self._main_window.bind('<KeyRelease>', self._key_release)
+    self._main_window.bind('<Button>', self._button_press)
+    self._main_window.bind('<ButtonRelease>', self._button_release)
+    self._main_window.bind('<Motion>', self._mouse_moved)
     self._update_make_feed()
     self._main_window.mainloop()
+
+  def _button_press(self, event):
+    """
+    """
+    if event.num == 1: # left click
+      self._mouse_x = event.x
+      self._mouse_y = event.y
+      self._mouse_down = True
+    if event.num == 2: # right click:
+      self._user_sim_x = event.x
+      self._user_sim_y = event.y
+      pass
+
+  def _button_release(self, event):
+    """
+    """
+    if event.num == 1: # left click
+      self._mouse_down = False
+
+  def _mouse_moved(self, event):
+    """
+    """
+    if self._mouse_down:
+      self._mouse_x = event.x
+      self._mouse_y = event.y
 
   def _key_press(self, event):
     """
@@ -150,12 +181,15 @@ class DisplayWindow():
     x2 = x1 + 20
     y2 = y1 + 20
     self._canvas.create_oval(x1, y1, x2, y2, fill='green')
-    c_x = (x2 + x1) / 2
-    c_y = (y2 + y1) / 2
-    end_x = c_x + 20 * math.cos(self._user_sim_theta)
-    end_y = c_y + 20 * math.sin(self._user_sim_theta)
+    end_x = self._user_sim_x + 20 * math.cos(self._user_sim_theta)
+    end_y = self._user_sim_y + 20 * math.sin(self._user_sim_theta)
     self._canvas.create_line(
-        c_x, c_y, end_x, end_y, width=4, fill='green')
+        self._user_sim_x, self._user_sim_y, end_x, end_y, width=4, fill='green')
+    # Draw a line from the user to the mouse if the mouse is pressed
+    if self._mouse_down:
+      self._canvas.create_line(
+          self._user_sim_x, self._user_sim_y, self._mouse_x, self._mouse_y,
+          fill='yellow')
     # Draw the text to display all pressed movement keys.
     text_y = self._bmap.num_rows - 50
     text_x = self._bmap.num_cols / 2
@@ -163,6 +197,8 @@ class DisplayWindow():
     buttons = [
         key.capitalize() for key in self._movement_keys
         if self._movement_keys[key] is True]
+    if self._mouse_down:
+      buttons.append('Mouse')
     buttons = ', '.join(buttons)
     self._canvas.create_text(
         text_x, text_y, font=font, text=buttons, fill='blue')
