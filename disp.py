@@ -18,6 +18,7 @@ class DisplayWindow():
   _PARTICLE_RADIUS = 5
   _ESTIMATE_COLOR = 'purple'
   _ESTIMATE_RADIUS = 30
+  _USER_CONTROL_FPS = 30
   _UPDATE_INTERVAL_MS = 500
 
   def __init__(self, building_map, map_img_name=None, pf=None,
@@ -52,19 +53,54 @@ class DisplayWindow():
     except:
       log_error('failed to load image: {}'.format(map_img_name))
       self._background_img = None
+    self._movement_keys = {
+      'up': False,
+      'down': False,
+      'left': False,
+      'right': False
+    }
+    self._user_sim_x = self._bmap.num_cols / 2
+    self._user_sim_y = self._bmap.num_rows / 2
+    self._user_sim_theta = 0
 
   def start_make_feed(self):
     """
     """
+    self._main_window.bind('<KeyPress>', self._key_press)
+    self._main_window.bind('<KeyRelease>', self._key_release)
     self._update_make_feed()
     self._main_window.mainloop()
+
+  def _key_press(self, event):
+    """
+    """
+    if event.keysym in ['w', 'W', 'Up']:
+      self._movement_keys['up'] = True
+    if event.keysym in ['s', 'S', 'Down']:
+      self._movement_keys['down'] = True
+    if event.keysym in ['a', 'A', 'Left']:
+      self._movement_keys['left'] = True
+    if event.keysym in ['d', 'D', 'Right']:
+      self._movement_keys['right'] = True
+
+  def _key_release(self, event):
+    """
+    """
+    if event.keysym in ['w', 'W', 'Up']:
+      self._movement_keys['up'] = False
+    if event.keysym in ['s', 'S', 'Down']:
+      self._movement_keys['down'] = False
+    if event.keysym in ['a', 'A', 'Left']:
+      self._movement_keys['left'] = False
+    if event.keysym in ['d', 'D', 'Right']:
+      self._movement_keys['right'] = False
 
   def _update_make_feed(self):
     """
     """
-    print 'update make feed'
     self._render_main()
-    self._main_window.after(1000, self._update_make_feed)
+    self._render_user_sim()
+    self._main_window.after(1000/self._USER_CONTROL_FPS, self._update_make_feed)
 
   def start_particle_filter(self):
     """Starts the update process and initializes the window's main loop.
@@ -105,6 +141,32 @@ class DisplayWindow():
       self._canvas.create_image(
           0, 0, image=self._background_img, anchor='nw')
   
+  def _render_user_sim(self):
+    """
+    """
+    # Draw the user's position and orientation.
+    x1 = self._user_sim_x - 10
+    y1 = self._user_sim_y - 10
+    x2 = x1 + 20
+    y2 = y1 + 20
+    self._canvas.create_oval(x1, y1, x2, y2, fill='green')
+    c_x = (x2 + x1) / 2
+    c_y = (y2 + y1) / 2
+    end_x = c_x + 20 * math.cos(self._user_sim_theta)
+    end_y = c_y + 20 * math.sin(self._user_sim_theta)
+    self._canvas.create_line(
+        c_x, c_y, end_x, end_y, width=4, fill='green')
+    # Draw the text to display all pressed movement keys.
+    text_y = self._bmap.num_rows - 50
+    text_x = self._bmap.num_cols / 2
+    font = ('Arial', 22)
+    buttons = [
+        key.capitalize() for key in self._movement_keys
+        if self._movement_keys[key] is True]
+    buttons = ', '.join(buttons)
+    self._canvas.create_text(
+        text_x, text_y, font=font, text=buttons, fill='blue')
+
   def _render_particles(self, turn_angle):
     """Draws the particles and info from the particle filter to the screen.
 
