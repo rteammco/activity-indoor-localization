@@ -64,26 +64,33 @@ if __name__ == '__main__':
   """
   parser = argparse.ArgumentParser()
   parser.add_argument(
-      '--config', dest='config_file', required=False,
-      help='Path of a configuration file.')
-  parser.add_argument(
       '--feed', dest='feed', required=True,
       help='The path for the data classifier feed file.')
   parser.add_argument(
       '--map-data', dest='map_data', required=True,
       help='The path for the map data file.')
   parser.add_argument(
+      '--config', dest='config_file', required=False,
+      help='Path of a configuration file.')
+  parser.add_argument(
       '--map-image', dest='map_image', required=False,
       help='The path for the map image file (.gif).')
   parser.add_argument(
       '--loop-feed', dest='loop_feed', action='store_true',
       help='Set this flag to loop the input feed after it finishes.')
+  parser.add_argument(
+      '--make-feed', dest='make_feed', action='store_true',
+      help='Set this flag to collect feed data from user control.')
   args = parser.parse_args()
   config = get_pf_config(args.config_file)
   # Start the simulation.
   building_map = BuildingMap(args.map_data)
-  pf = ParticleFilter(config, building_map)
-  loop_feed = True if args.loop_feed else False
-  feed_processor = FeedProcessor(args.feed, loop_feed)
-  w = DisplayWindow(pf, building_map, feed_processor, args.map_image, loop_feed)
-  w.start()
+  if args.make_feed:
+    w = DisplayWindow(building_map, args.map_image)
+    w.start_make_feed()
+  else:
+    pf = ParticleFilter(config, building_map)
+    feed_processor = FeedProcessor(args.feed, args.loop_feed)
+    w = DisplayWindow(
+        building_map, args.map_image, pf, feed_processor)
+    w.start_particle_filter()

@@ -20,25 +20,25 @@ class DisplayWindow():
   _ESTIMATE_RADIUS = 30
   _UPDATE_INTERVAL_MS = 500
 
-  def __init__(self, pf, building_map, feed_processor, map_img_name,
-               loop_feed=True):
+  def __init__(self, building_map, map_img_name=None, pf=None,
+               feed_processor=None):
     """Initializes the displayed window and the canvas to draw with.
 
     Args:
-      pf: a ParticleFilter object with all parameters set up. This object's
-          update() function will be called every frame, and its particles will
-          be used to visualize the map state.
       building_map: a BuildingMap object that contains the region definitions
           (bitmap) as well as the probabilities for each region. This will also
           be updated every frame.
-      feed_processor: a FeedProcessor object that contains a classifier data
-          feed from which to update the map and particle filter motion from.
       map_img_name: the name (directory path) of the background map image that
           will be displayed in the background. This must be a .gif file with the
           image of the building map.
+      pf: a ParticleFilter object with all parameters set up. This object's
+          update() function will be called every frame, and its particles will
+          be used to visualize the map state.
+      feed_processor: a FeedProcessor object that contains a classifier data
+          feed from which to update the map and particle filter motion from.
     """
-    self._pf = pf
     self._bmap = building_map
+    self._pf = pf
     self._feed_processor = feed_processor
     self._main_window = Tk.Tk()
     self._main_window.title('Particle Filter')
@@ -53,13 +53,32 @@ class DisplayWindow():
       log_error('failed to load image: {}'.format(map_img_name))
       self._background_img = None
 
-  def start(self):
-    """Starts the update process and initializes the window's main loop.
+  def start_make_feed(self):
     """
-    self._update()
+    """
+    self._update_make_feed()
     self._main_window.mainloop()
 
-  def _update(self):
+  def _update_make_feed(self):
+    """
+    """
+    print 'update make feed'
+    self._render_main()
+    self._main_window.after(1000, self._update_make_feed)
+
+  def start_particle_filter(self):
+    """Starts the update process and initializes the window's main loop.
+
+    This action will start the particle filter simulation. For this case, the
+    particle filter, map object, and processor feed must not be None.
+    """
+    if self._pf is None or self._bmap is None or self._feed_processor is None:
+      log_error('cannot start updating particle filter', terminate=True)
+      return
+    self._update_particle_filter()
+    self._main_window.mainloop()
+
+  def _update_particle_filter(self):
     """Update the particle filter and map and render the visualizations.
 
     Also queues the next update after _UPDATE_INTERVAL_MS miliseconds. All
@@ -70,20 +89,33 @@ class DisplayWindow():
       self._bmap.set_probabilities(probabilities)
     # Update particle filter and render everything until the next frame.
     self._pf.update(turn_angle=turn_angle)
-    self._render(turn_angle)
-    self._main_window.after(self._UPDATE_INTERVAL_MS, self._update)
+    self._render_main()
+    self._render_particles(turn_angle)
+    self._main_window.after(
+        self._UPDATE_INTERVAL_MS, self._update_particle_filter)
 
-  def _render(self, turn_angle):
-    """Draws the map image and all of the particles to the screen.
+  def _render_main(self):
+    """Clears the screen and draws the map image.
 
-    Args:
-      turn_angle: the turning angle (will be displayed for visualization).
+    This method should be called before rendering anything else.
     """
     self._canvas.delete('all')
     # Draw the map.
     if self._background_img:
       self._canvas.create_image(
           0, 0, image=self._background_img, anchor='nw')
+  
+  def _render_particles(self, turn_angle):
+    """Draws the particles and info from the particle filter to the screen.
+
+    This should only be called if the particle filter is defined.
+
+    Args:
+      turn_angle: the turning angle (will be displayed for visualization).
+    """
+    if not self._pf:
+      log_error('cannot render particle filter: variable _pf not defined.')
+      return
     # Draw the particles.
     for particle in self._pf.particles:
       # Scale radius based on probability for visualization.
