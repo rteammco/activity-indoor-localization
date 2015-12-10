@@ -36,8 +36,9 @@ class DisplayWindow():
 
     Args:
       building_map: a BuildingMap object that contains the region definitions
-          (bitmap) as well as the probabilities for each region. This will also
-          be updated every frame.
+          (bitmap) as well as the probabilities for each region (for pf mode).
+          In pf mode, this will also be updated every frame with the feed
+          processor.
       map_img_name: the name (directory path) of the background map image that
           will be displayed in the background. This must be a .gif file with the
           image of the building map.
@@ -59,7 +60,7 @@ class DisplayWindow():
     # Set up the simulation if the particle filter is not available.
     self._sim = None
     if not self._pf:
-      self._sim = Simulation(self._bmap.num_cols, self._bmap.num_rows)
+      self._sim = Simulation(self._bmap)
     # Try to load the background map image.
     try:
       self._background_img = Tk.PhotoImage(file=map_img_name)
