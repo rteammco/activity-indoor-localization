@@ -13,13 +13,18 @@ class DisplayWindow():
   localization process.
   """
 
-  # Display settings.
+  # Display settings for particle filter.
   _PARTICLE_COLOR = 'yellow'
   _PARTICLE_RADIUS = 5
   _ESTIMATE_COLOR = 'purple'
   _ESTIMATE_RADIUS = 30
-  _USER_CONTROL_FPS = 30
   _UPDATE_INTERVAL_MS = 500
+  # Display settings for user simulation.
+  _SIM_USER_COLOR = 'green'
+  _SIM_USER_RADIUS = 10
+  _SIM_MOVE_SPEED = 1.2
+  _SIM_DIST_THRESHOLD = 30
+  _USER_CONTROL_FPS = 30
 
   def __init__(self, building_map, map_img_name=None, pf=None,
                feed_processor=None):
@@ -59,6 +64,7 @@ class DisplayWindow():
       'left': False,
       'right': False
     }
+    self._sim_locked = True
     self._user_sim_x = self._bmap.num_cols / 2
     self._user_sim_y = self._bmap.num_rows / 2
     self._user_sim_theta = 0
@@ -84,10 +90,9 @@ class DisplayWindow():
       self._mouse_x = event.x
       self._mouse_y = event.y
       self._mouse_down = True
-    if event.num == 2: # right click:
+    if event.num == 2 and not self._sim_locked: # right click:
       self._user_sim_x = event.x
       self._user_sim_y = event.y
-      pass
 
   def _button_release(self, event):
     """
@@ -105,6 +110,8 @@ class DisplayWindow():
   def _key_press(self, event):
     """
     """
+    if event.keysym == 'Escape':
+      self._sim_locked = not self._sim_locked
     if event.keysym in ['w', 'W', 'Up']:
       self._movement_keys['up'] = True
     if event.keysym in ['s', 'S', 'Down']:
@@ -129,6 +136,16 @@ class DisplayWindow():
   def _update_make_feed(self):
     """
     """
+    # Update user theta to direct towards the mouse.
+    dx = self._mouse_x - self._user_sim_x
+    dy = self._mouse_y - self._user_sim_y
+    if self._mouse_down and not self._sim_locked:
+      self._user_sim_theta = math.atan2(dy, dx)
+    # Update user position to 'walk' towards the mouse.
+    if (self._mouse_down and not self._sim_locked and
+        (dx*dx + dy*dy) >= self._SIM_DIST_THRESHOLD*self._SIM_DIST_THRESHOLD):
+      self._user_sim_x += self._SIM_MOVE_SPEED * math.cos(self._user_sim_theta)
+      self._user_sim_y += self._SIM_MOVE_SPEED * math.sin(self._user_sim_theta)
     self._render_main()
     self._render_user_sim()
     self._main_window.after(1000/self._USER_CONTROL_FPS, self._update_make_feed)
@@ -176,15 +193,24 @@ class DisplayWindow():
     """
     """
     # Draw the user's position and orientation.
-    x1 = self._user_sim_x - 10
-    y1 = self._user_sim_y - 10
-    x2 = x1 + 20
-    y2 = y1 + 20
-    self._canvas.create_oval(x1, y1, x2, y2, fill='green')
-    end_x = self._user_sim_x + 20 * math.cos(self._user_sim_theta)
-    end_y = self._user_sim_y + 20 * math.sin(self._user_sim_theta)
+    x1 = self._user_sim_x - self._SIM_USER_RADIUS
+    y1 = self._user_sim_y - self._SIM_USER_RADIUS
+    r2 = 2 * self._SIM_USER_RADIUS
+    x2 = x1 + r2
+    y2 = y1 + r2
+    self._canvas.create_oval(x1, y1, x2, y2, fill=self._SIM_USER_COLOR)
+    end_x = self._user_sim_x + r2 * math.cos(self._user_sim_theta)
+    end_y = self._user_sim_y + r2 * math.sin(self._user_sim_theta)
     self._canvas.create_line(
-        self._user_sim_x, self._user_sim_y, end_x, end_y, width=4, fill='green')
+        self._user_sim_x, self._user_sim_y, end_x, end_y, width=4,
+        fill=self._SIM_USER_COLOR)
+    # Draw a circle around the user to indicate the mouse activity distance.
+    x1 = self._user_sim_x - self._SIM_DIST_THRESHOLD
+    y1 = self._user_sim_y - self._SIM_DIST_THRESHOLD
+    r2 = 2 * self._SIM_DIST_THRESHOLD
+    x2 = x1 + r2
+    y2 = y1 + r2
+    self._canvas.create_oval(x1, y1, x2, y2, outline='red')
     # Draw a line from the user to the mouse if the mouse is pressed
     if self._mouse_down:
       self._canvas.create_line(
@@ -194,14 +220,19 @@ class DisplayWindow():
     text_y = self._bmap.num_rows - 50
     text_x = self._bmap.num_cols / 2
     font = ('Arial', 22)
-    buttons = [
-        key.capitalize() for key in self._movement_keys
-        if self._movement_keys[key] is True]
-    if self._mouse_down:
-      buttons.append('Mouse')
-    buttons = ', '.join(buttons)
-    self._canvas.create_text(
-        text_x, text_y, font=font, text=buttons, fill='blue')
+    if not self._sim_locked:
+      buttons = [
+          key.capitalize() for key in self._movement_keys
+          if self._movement_keys[key] is True]
+      if self._mouse_down:
+        buttons.append('Mouse')
+      buttons = ', '.join(buttons)
+      self._canvas.create_text(
+          text_x, text_y, font=font, text=buttons, fill='blue')
+    else:
+      locked_text = 'Simulation locked. Press ESC to unlock.'
+      self._canvas.create_text(
+          text_x, text_y, font=font, text=locked_text, fill='red')
 
   def _render_particles(self, turn_angle):
     """Draws the particles and info from the particle filter to the screen.
