@@ -16,6 +16,7 @@ class DisplayWindow(object):
 
   # General display settings.
   _TEXT_FONT = ('Arial', 22)
+  _TEXT_FONT_SMALL = ('Arial', 16)
   # Display settings for particle filter.
   _PARTICLE_COLOR = 'yellow'
   _PARTICLE_RADIUS = 5
@@ -199,6 +200,7 @@ class DisplayWindow(object):
       return
     self._render_pf_particles()
     self._render_pf_location_estimates()
+    self._render_pf_ground_truth()
     self._render_pf_info(turn_angle)
 
   def _render_pf_particles(self):
@@ -225,6 +227,11 @@ class DisplayWindow(object):
       end_y = c_y + r * math.sin(particle.theta)
       self._canvas.create_line(
           c_x, c_y, end_x, end_y, fill=self._PARTICLE_COLOR)
+
+  def _render_pf_ground_truth(self):
+    """Draws the ground truth data for the particle filter if available.
+    """
+    pass
 
   def _render_pf_location_estimates(self):
     """Draws the particle location estimates (and ground truth if available).
@@ -274,7 +281,7 @@ class DisplayWindow(object):
       turn_angle: the turning angle that will be displayed for visualization. If
           its value is 0, it will not be shown.
     """
-    # Draw the probabilities and current max estimate.
+    # Display the probabilities and current max estimate.
     # TODO: don't hard-code the locations here!
     text_y = self._bmap.num_rows - 50
     text_x = self._bmap.num_cols / 2
@@ -293,8 +300,17 @@ class DisplayWindow(object):
           x, text_y, font=self._TEXT_FONT, text=name, fill=color)
       self._canvas.create_text(
           x, text_y + 25, font=self._TEXT_FONT, text=prob, fill=color)
+    # If the user is turning, display the turning angle.
     if turn_angle != 0:
       turn_angle = 'TURNING: ' + str(round(turn_angle, 3))
       turn_x = text_x + padding * 4
       self._canvas.create_text(turn_x, text_y + 12, font=self._TEXT_FONT,
           text=turn_angle, fill='green')
+    # Render other information about the particle filter.
+    err_dist = '{} meters error'.format(0)
+    num_clusters = '{} clusters'.format(len(self._pf.predicted_weights))
+    text_x = 50
+    self._canvas.create_text(text_x, text_y, font=self._TEXT_FONT_SMALL,
+        text=err_dist, fill='blue', anchor='nw')
+    self._canvas.create_text(text_x, text_y + 20, font=self._TEXT_FONT_SMALL,
+        text=num_clusters, fill='blue', anchor='nw')
