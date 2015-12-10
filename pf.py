@@ -78,7 +78,7 @@ class ParticleFilter(object):
   map state.
   """
 
-  def __init__(self, config, building_map):
+  def __init__(self, config, building_map, feed_processor):
     """Initialize the particle filter parameters and all of the particles.
 
     All particles are initially placed in random positions.
@@ -88,9 +88,12 @@ class ParticleFilter(object):
           values.
       building_map: a BuildingMap object that will be referenced to update
           particle probabilities during updates.
+      feed_processor: a FeedProcessor object that contains a classifier data
+          feed from which to update the map and particle filter motion from.
     """
     self._config = config
     self._bmap = building_map
+    self._feed_processor = feed_processor
     self.particles = []
     for i in range(self._config.NUM_PARTICLES):
       particle = Particle(self._bmap.num_cols, self._bmap.num_rows)
@@ -102,24 +105,19 @@ class ParticleFilter(object):
     self.predicted_weights = [0]
     self.best_predicted = 0
 
-  def update(self, user_moving=True, turn_angle=0):
+  def update(self):
     """Updates the particle filter by one or more interation.
 
     Repeats multiple times if the given PFConfig specifies more updates per
     single frame interation.
-
-    Args:
-      user_moving: if the user is moving, this should be True (as by default).
-          If the user is not moving, set this to False. The user's movement can
-          be determined by analyzing the motion data.
-      turn_angle: the user's turning angle. If a value is provided, the theta
-          for particles will be incremented by that amount.
     """
+    probabilities, motion, ground_truth = self._feed_processor.get_next()
+    if probabilities is not None:
+      self._bmap.set_probabilities(probabilities)
     for i in range(self._config.UPDATES_PER_FRAME):
-      if user_moving: # TODO: provide a movement speed (or multiplier).
-        self._move_particles(self._config.PARTICLE_MOVE_SPEED)
-      if turn_angle != 0:
-        self._turn_particles(turn_angle)
+      if motion is not None:
+        self._move_particles(self._config.PARTICLE_MOVE_SPEED) # TODO: use the speed
+        self._turn_particles(0) # TODO use the turn rate
       if self._config.RANDOM_WALK_FREQUENCY != 0 and (
           self._frame % self._config.RANDOM_WALK_FREQUENCY) == 0:
         self._random_walk()
@@ -128,6 +126,7 @@ class ParticleFilter(object):
       self._resample(weight_sum)
       self._estimate_location()
       self._frame += 1
+    return 0, 0
 
   def _move_particles(self, amount):
     """Moves all particles forward by the given amount.

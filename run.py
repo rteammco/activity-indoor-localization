@@ -89,8 +89,8 @@ if __name__ == '__main__':
     w = DisplayWindow(building_map, args.map_image, feed_fname=args.feed)
     w.start_make_feed()
   else:
-    pf = ParticleFilter(config, building_map)
     feed_processor = FeedProcessor(args.feed, args.loop_feed)
+    pf = ParticleFilter(config, building_map, feed_processor)
     w = DisplayWindow(
         building_map, args.map_image, pf, feed_processor)
     w.start_particle_filter()

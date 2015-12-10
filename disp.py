@@ -32,8 +32,7 @@ class DisplayWindow(object):
   _SIM_MODE = 0
   _PF_MODE = 1
 
-  def __init__(self, building_map, map_img_name=None, pf=None,
-               feed_processor=None, feed_fname=''):
+  def __init__(self, building_map, map_img_name=None, pf=None, feed_fname=''):
     """Initializes the displayed window and the canvas to draw with.
 
     Args:
@@ -47,12 +46,9 @@ class DisplayWindow(object):
       pf: a ParticleFilter object with all parameters set up. This object's
           update() function will be called every frame, and its particles will
           be used to visualize the map state.
-      feed_processor: a FeedProcessor object that contains a classifier data
-          feed from which to update the map and particle filter motion from.
     """
     self._bmap = building_map
     self._pf = pf
-    self._feed_processor = feed_processor
     self._main_window = Tk.Tk()
     self._main_window.title('Particle Filter')
     self._canvas = Tk.Canvas(
@@ -107,7 +103,7 @@ class DisplayWindow(object):
     This action will start the particle filter simulation. For this case, the
     particle filter, map object, and processor feed must not be None.
     """
-    if self._pf is None or self._bmap is None or self._feed_processor is None:
+    if self._pf is None or self._bmap is None:
       log_error('cannot start updating particle filter', terminate=True)
       return
     self._update_particle_filter()
@@ -119,11 +115,8 @@ class DisplayWindow(object):
     Also queues the next update after _UPDATE_INTERVAL_MS miliseconds. All
     updates happen here to all components of the particle filter program.
     """
-    probabilities, turn_angle = self._feed_processor.get_next()
-    if probabilities is not None:
-      self._bmap.set_probabilities(probabilities)
     # Update particle filter and render everything until the next frame.
-    self._pf.update(turn_angle=turn_angle)
+    turn_angle, move_speed = self._pf.update()
     self._render_main()
     self._render_particle_filter(turn_angle)
     self._main_window.after(

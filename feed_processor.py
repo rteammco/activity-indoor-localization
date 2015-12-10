@@ -26,27 +26,40 @@ class FeedProcessor(object):
       one at a time to the BuildingMap object to update its region probabilites.
     """
     self._probability_list = []
-    self._turn_angles = []
+    self._motions = []
+    self._ground_truths = []
     self._loop_feed = loop_feed
     try:
       f = open(feed_file_name, 'r')
       for line in f:
         line = line.strip()
+        # Skip empty or commented lines.
         if len(line) == 0 or line.startswith('#'):
           continue
-        # If line begins with a '+', that means it's a turn angle, so add that
-        # turn value to the previous position.
+        # If line begins with a '+', that means it's odometry and a turn angle,
+        # so add those values to the previous position.
         if line.startswith('+'):
           line = line[1:]
-          line = line.strip()
-          turn_angle = float(line)
-          if len(self._turn_angles) > 0:
-            self._turn_angles[-1] = turn_angle
+          line = line.split()
+          if len(line) >= 2:
+            motion = int(line[0]), float(line[1])
+            if len(self._motions) > 0:
+              self._motions[-1] = motion
+        # If line begins with a '!', that means it's ground truth information,
+        # so add that information to the previous position.
+        elif line.startswith('!'):
+          line = line[1:]
+          line = line.split()
+          if len(line) >= 3:
+            ground_truth = int(line[0]), int(line[1]), float(line[2])
+            if len(self._ground_truths) > 0:
+              self._ground_truths[-1] = ground_truth
         # Otherwise add the probabilities and a turn angle of 0.
         else:
           line = line.split()
           self._probability_list.append(map(float, line))
-          self._turn_angles.append(0)
+          self._motions.append(None)
+          self._ground_truths.append(None)
     except:
       log_error('failed to load feed file: {}'.format(feed_file_name))
     self._next_index = 0
@@ -74,13 +87,14 @@ class FeedProcessor(object):
       If there is no more data in the stream and looping is turned off, probs
       will be None and turn_angle will be 0.
     """
-    probs = None
-    turn_angle = 0
     if self._num_feeds > self._next_index:
       probs = self._probability_list[self._next_index]
-      turn_angle = self._turn_angles[self._next_index]
+      motion = self._motions[self._next_index]
+      ground_truth = self._ground_truths[self._next_index]
       self._next_index += 1
       # If index is out of bounds, reset if we are looping the classifier feed.
       if self._next_index >= self._num_feeds and self._loop_feed:
         self._next_index = 0
-    return probs, turn_angle
+      return probs, motion, ground_truth
+    else:
+      return None, None, None
