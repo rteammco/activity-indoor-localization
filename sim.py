@@ -102,7 +102,7 @@ class Simulation(object):
     self.user_sim_y = self._bmap.num_rows / 2
     self.user_sim_theta = 0
     # Simulation log values.
-    self._sim_logs = []
+    self.sim_logs = []
     self._log_rate = log_rate
     self._frame = 0
 
@@ -142,13 +142,13 @@ class Simulation(object):
     dist_traveled = 0
     amount_turned = 0
     region = self._bmap.region_at(int(self.user_sim_x), int(self.user_sim_y))
-    if len(self._sim_logs) > 0:
-      prev_log = self._sim_logs[-1]
+    if len(self.sim_logs) > 0:
+      prev_log = self.sim_logs[-1]
       dist_traveled = prev_log.dist_to(self.user_sim_x, self.user_sim_y)
       amount_turned = prev_log.ground_truth_theta - self.user_sim_theta
-    self._sim_logs.append(FeedDataPoint(region, dist_traveled, amount_turned,
+    self.sim_logs.append(FeedDataPoint(region, dist_traveled, amount_turned,
         self.user_sim_x, self.user_sim_y, self.user_sim_theta))
-    print str(self._sim_logs[-1])
+    print str(self.sim_logs[-1])
 
   def save_logs(self):
     """Saves the logged data to the given file.
@@ -162,7 +162,7 @@ class Simulation(object):
     print 'pressed'
     #try:
     #  f = open(fname, 'w')
-    #  for log in self._sim_logs:
+    #  for log in self.sim_logs:
     #    f.write(str(log) + '\n')
     #  f.close()
     #except:

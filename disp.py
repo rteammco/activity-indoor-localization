@@ -189,6 +189,9 @@ class DisplayWindow(object):
       locked_text = 'Simulation locked. Press ESC to unlock.'
       self._canvas.create_text(
           text_x, text_y, font=self._TEXT_FONT, text=locked_text, fill='red')
+    # Display some information about the running simulation.
+    num_logs = '{} logs recorded'.format(len(self._sim.sim_logs))
+    self._render_info_text([num_logs])
 
   def _render_particle_filter(self, turn_angle):
     """Draws the particles and info from the particle filter to the screen.
@@ -312,8 +315,21 @@ class DisplayWindow(object):
     # Render other information about the particle filter.
     err_dist = '{} meters error'.format(0)
     num_clusters = '{} clusters'.format(len(self._pf.predicted_weights))
-    text_x = 50
-    self._canvas.create_text(text_x, text_y, font=self._TEXT_FONT_SMALL,
-        text=err_dist, fill='blue', anchor='nw')
-    self._canvas.create_text(text_x, text_y + 20, font=self._TEXT_FONT_SMALL,
-        text=num_clusters, fill='blue', anchor='nw')
+    self._render_info_text([err_dist, num_clusters])
+
+  def _render_info_text(self, info_strings):
+    """Renders the given list of info strings on the screen.
+
+    This will display the strings on the bottom left corner of the window.
+
+    Args:
+      info_strings: a list of strings that will be drawn in smaller text on the
+          bottom left corner of the window.
+    """
+    text_x = 20
+    text_y = self._bmap.num_rows - 20
+    for i in range(len(info_strings) - 1, -1, -1):
+      info_string = info_strings[i]
+      self._canvas.create_text(text_x, text_y, font=self._TEXT_FONT_SMALL,
+          text=info_string, fill='blue', anchor='nw')
+      text_y -= 20
