@@ -3,6 +3,7 @@ import time
 import Tkinter as Tk
 
 from errlog import log_error
+from sim import Simulation
 
 
 class DisplayWindow():
@@ -52,100 +53,38 @@ class DisplayWindow():
         self._main_window, width=self._bmap.num_cols,
         height=self._bmap.num_rows, background='white')
     self._canvas.pack()
+    # Set up the simulation if the particle filter is not available.
+    self._sim = None
+    if not self._pf:
+      self._sim = Simulation(self._bmap.num_cols, self._bmap.num_rows)
     # Try to load the background map image.
     try:
       self._background_img = Tk.PhotoImage(file=map_img_name)
     except:
       log_error('failed to load image: {}'.format(map_img_name))
       self._background_img = None
-    self._movement_keys = {
-      'up': False,
-      'down': False,
-      'left': False,
-      'right': False
-    }
-    self._sim_locked = True
-    self._user_sim_x = self._bmap.num_cols / 2
-    self._user_sim_y = self._bmap.num_rows / 2
-    self._user_sim_theta = 0
-    self._mouse_x = 0
-    self._mouse_y = 0
-    self._mouse_down = False
 
   def start_make_feed(self):
+    """Starts the use-controlled simulation to generate a feed file.
+
+    Binds user inputs and starts the UI loop. If the simulation object is not
+    available, this function will log a fatal error.
     """
-    """
-    self._main_window.bind('<KeyPress>', self._key_press)
-    self._main_window.bind('<KeyRelease>', self._key_release)
-    self._main_window.bind('<Button>', self._button_press)
-    self._main_window.bind('<ButtonRelease>', self._button_release)
-    self._main_window.bind('<Motion>', self._mouse_moved)
+    if not self._sim:
+      log_error(
+        'could not start sim: Simulation object missing.', terminate=True)
+      return
+    self._main_window.bind('<KeyPress>', self._sim.key_press)
+    self._main_window.bind('<Button>', self._sim.button_press)
+    self._main_window.bind('<ButtonRelease>', self._sim.button_release)
+    self._main_window.bind('<Motion>', self._sim.mouse_moved)
     self._update_make_feed()
     self._main_window.mainloop()
 
-  def _button_press(self, event):
-    """
-    """
-    if event.num == 1: # left click
-      self._mouse_x = event.x
-      self._mouse_y = event.y
-      self._mouse_down = True
-    if event.num == 2 and not self._sim_locked: # right click:
-      self._user_sim_x = event.x
-      self._user_sim_y = event.y
-
-  def _button_release(self, event):
-    """
-    """
-    if event.num == 1: # left click
-      self._mouse_down = False
-
-  def _mouse_moved(self, event):
-    """
-    """
-    if self._mouse_down:
-      self._mouse_x = event.x
-      self._mouse_y = event.y
-
-  def _key_press(self, event):
-    """
-    """
-    if event.keysym == 'Escape':
-      self._sim_locked = not self._sim_locked
-    if event.keysym in ['w', 'W', 'Up']:
-      self._movement_keys['up'] = True
-    if event.keysym in ['s', 'S', 'Down']:
-      self._movement_keys['down'] = True
-    if event.keysym in ['a', 'A', 'Left']:
-      self._movement_keys['left'] = True
-    if event.keysym in ['d', 'D', 'Right']:
-      self._movement_keys['right'] = True
-
-  def _key_release(self, event):
-    """
-    """
-    if event.keysym in ['w', 'W', 'Up']:
-      self._movement_keys['up'] = False
-    if event.keysym in ['s', 'S', 'Down']:
-      self._movement_keys['down'] = False
-    if event.keysym in ['a', 'A', 'Left']:
-      self._movement_keys['left'] = False
-    if event.keysym in ['d', 'D', 'Right']:
-      self._movement_keys['right'] = False
-
   def _update_make_feed(self):
+    """Updates the Simulation object and renders the simulation.
     """
-    """
-    # Update user theta to direct towards the mouse.
-    dx = self._mouse_x - self._user_sim_x
-    dy = self._mouse_y - self._user_sim_y
-    if self._mouse_down and not self._sim_locked:
-      self._user_sim_theta = math.atan2(dy, dx)
-    # Update user position to 'walk' towards the mouse.
-    if (self._mouse_down and not self._sim_locked and
-        (dx*dx + dy*dy) >= self._SIM_DIST_THRESHOLD*self._SIM_DIST_THRESHOLD):
-      self._user_sim_x += self._SIM_MOVE_SPEED * math.cos(self._user_sim_theta)
-      self._user_sim_y += self._SIM_MOVE_SPEED * math.sin(self._user_sim_theta)
+    self._sim.update()
     self._render_main()
     self._render_user_sim()
     self._main_window.after(1000/self._USER_CONTROL_FPS, self._update_make_feed)
@@ -190,45 +129,42 @@ class DisplayWindow():
           0, 0, image=self._background_img, anchor='nw')
   
   def _render_user_sim(self):
-    """
+    """Renders the simulation component to the screen.
+
+    This includes the simulated user and the mouse dragging line.
     """
     # Draw the user's position and orientation.
-    x1 = self._user_sim_x - self._SIM_USER_RADIUS
-    y1 = self._user_sim_y - self._SIM_USER_RADIUS
+    x1 = self._sim.user_sim_x - self._SIM_USER_RADIUS
+    y1 = self._sim.user_sim_y - self._SIM_USER_RADIUS
     r2 = 2 * self._SIM_USER_RADIUS
     x2 = x1 + r2
     y2 = y1 + r2
     self._canvas.create_oval(x1, y1, x2, y2, fill=self._SIM_USER_COLOR)
-    end_x = self._user_sim_x + r2 * math.cos(self._user_sim_theta)
-    end_y = self._user_sim_y + r2 * math.sin(self._user_sim_theta)
+    end_x = self._sim.user_sim_x + r2 * math.cos(self._sim.user_sim_theta)
+    end_y = self._sim.user_sim_y + r2 * math.sin(self._sim.user_sim_theta)
     self._canvas.create_line(
-        self._user_sim_x, self._user_sim_y, end_x, end_y, width=4,
+        self._sim.user_sim_x, self._sim.user_sim_y, end_x, end_y, width=4,
         fill=self._SIM_USER_COLOR)
     # Draw a circle around the user to indicate the mouse activity distance.
-    x1 = self._user_sim_x - self._SIM_DIST_THRESHOLD
-    y1 = self._user_sim_y - self._SIM_DIST_THRESHOLD
+    x1 = self._sim.user_sim_x - self._SIM_DIST_THRESHOLD
+    y1 = self._sim.user_sim_y - self._SIM_DIST_THRESHOLD
     r2 = 2 * self._SIM_DIST_THRESHOLD
     x2 = x1 + r2
     y2 = y1 + r2
     self._canvas.create_oval(x1, y1, x2, y2, outline='red')
     # Draw a line from the user to the mouse if the mouse is pressed
-    if self._mouse_down:
+    if self._sim.mouse_down:
       self._canvas.create_line(
-          self._user_sim_x, self._user_sim_y, self._mouse_x, self._mouse_y,
-          fill='yellow')
+          self._sim.user_sim_x, self._sim.user_sim_y, self._sim.mouse_x,
+          self._sim.mouse_y, fill='yellow')
     # Draw the text to display all pressed movement keys.
     text_y = self._bmap.num_rows - 50
     text_x = self._bmap.num_cols / 2
     font = ('Arial', 22)
-    if not self._sim_locked:
-      buttons = [
-          key.capitalize() for key in self._movement_keys
-          if self._movement_keys[key] is True]
-      if self._mouse_down:
-        buttons.append('Mouse')
-      buttons = ', '.join(buttons)
-      self._canvas.create_text(
-          text_x, text_y, font=font, text=buttons, fill='blue')
+    if not self._sim.sim_locked:
+      if self._sim.mouse_down:
+        self._canvas.create_text(
+            text_x, text_y, font=font, text='Logging', fill='blue')
     else:
       locked_text = 'Simulation locked. Press ESC to unlock.'
       self._canvas.create_text(
