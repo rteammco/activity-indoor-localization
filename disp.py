@@ -254,5 +254,5 @@ class DisplayWindow():
     if turn_angle != 0:
       turn_angle = 'TURNING: ' + str(round(turn_angle, 3))
       turn_x = text_x + padding * 4
-      self._canvas.create_text(
-          turn_x, text_y + 12, font=font, text=turn_angle, fill='green')
+      self._canvas.create_text(turn_x, text_y + 12, font=self._TEXT_FONT,
+          text=turn_angle, fill='green')
