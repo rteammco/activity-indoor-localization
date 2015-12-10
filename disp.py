@@ -33,7 +33,7 @@ class DisplayWindow(object):
   _PF_MODE = 1
 
   def __init__(self, building_map, map_img_name=None, pf=None,
-               feed_processor=None):
+               feed_processor=None, feed_fname=''):
     """Initializes the displayed window and the canvas to draw with.
 
     Args:
@@ -64,7 +64,7 @@ class DisplayWindow(object):
     if not self._pf:
       seconds_per_log = self._UPDATE_INTERVAL_MS / 1000.0
       log_rate = int(self._USER_CONTROL_FPS * seconds_per_log)
-      self._sim = Simulation(self._bmap, log_rate)
+      self._sim = Simulation(self._bmap, feed_fname, log_rate)
     # Try to load the background map image.
     try:
       self._background_img = Tk.PhotoImage(file=map_img_name)
@@ -87,6 +87,9 @@ class DisplayWindow(object):
     self._main_window.bind('<Button>', self._sim.button_press)
     self._main_window.bind('<ButtonRelease>', self._sim.button_release)
     self._main_window.bind('<Motion>', self._sim.mouse_moved)
+    save_button = Tk.Button(
+        self._main_window, text='Save Logs', command=self._sim.save_logs)
+    save_button.pack()
     self._update_make_feed()
     self._main_window.mainloop()
 

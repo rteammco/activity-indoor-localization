@@ -1,5 +1,7 @@
 import math
 
+from errlog import log_error
+
 
 class FeedDataPoint(object):
   """An object that contains data for a single log entry of the simulation.
@@ -74,7 +76,7 @@ class Simulation(object):
   MOVE_SPEED = 1.2
   DIST_THRESH = 30
 
-  def __init__(self, building_map, log_rate=0):
+  def __init__(self, building_map, feed_fname, log_rate=0):
     """Initializes the simulation parameters and the user position
 
     Sets the user position to the center of the map. By default, the simulation
@@ -83,10 +85,13 @@ class Simulation(object):
     Args:
       building_map: a BuildingMap object that contains the region definitions
           and the general size of the map.
+      feed_fname: the name of the feed file to which all logged data will be
+          saved to if the save function is called.
       log_rate: the number of update calls that need to go by before logging
           occurs. If this value is left as 0, no logging happens.
     """
     self._bmap = building_map
+    self._feed_fname = feed_fname
     self.sim_locked = True
     # Mouse state values.
     self.mouse_down = False
@@ -144,6 +149,24 @@ class Simulation(object):
     self._sim_logs.append(FeedDataPoint(region, dist_traveled, amount_turned,
         self.user_sim_x, self.user_sim_y, self.user_sim_theta))
     print str(self._sim_logs[-1])
+
+  def save_logs(self):
+    """Saves the logged data to the given file.
+
+    Args:
+      fname: the name of the text file to which the log data will be written.
+    """
+    if not self._feed_fname:
+      log_error('cannot save log: no feed file name provided')
+      return
+    print 'pressed'
+    #try:
+    #  f = open(fname, 'w')
+    #  for log in self._sim_logs:
+    #    f.write(str(log) + '\n')
+    #  f.close()
+    #except:
+    #  log_error('failed writing to file "{}"'.format(fname))
 
   def button_press(self, event):
     """Event hanlder function for a mouse button press.

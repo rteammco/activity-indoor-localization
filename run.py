@@ -86,7 +86,7 @@ if __name__ == '__main__':
   # Start the simulation.
   building_map = BuildingMap(args.map_data)
   if args.make_feed:
-    w = DisplayWindow(building_map, args.map_image)
+    w = DisplayWindow(building_map, args.map_image, feed_fname=args.feed)
     w.start_make_feed()
   else:
     pf = ParticleFilter(config, building_map)
