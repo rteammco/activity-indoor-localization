@@ -17,6 +17,7 @@ class PFConfig(object):
   RANDOM_WALK_MAX_DIST = 10
   RANDOM_WALK_MAX_THETA = math.pi / 4
   WEIGHT_DECAY_RATE = 1.0
+  CLUSTER_BIN_WIDTH = 10
 
 
 class Particle(object):
@@ -42,6 +43,9 @@ class Particle(object):
     self.y = random.randint(1, map_height)
     self.theta = random.random() * 2 * math.pi
     self.weight = 1.0
+    self.bin_x = 0
+    self.bin_y = 0
+    self.cluster_id = 0
 
   def move_by(self, amount):
     """Moves the particle by the given amount in its oriented direction.
@@ -216,6 +220,63 @@ class ParticleFilter(object):
       new_particles.append(selection.clone())
     self.particles = new_particles
 
+  def _cluster_particles(self):
+    """Assigns to each particle a cluster value based on its location.
+
+    Particles close to each other will be placed into the same cluster. The
+    total number of clusters is also stored.
+    """
+    # TODO: clean up this function.
+    ######
+    class ClusterBin(object):
+      def __init__(self):
+        self.particles = []
+        self.label = -1
+    ######
+    def label_cluster(bins, x, y, label):
+      if y < 0 or y >= len(bins) or x < 0 or len(bins) == 0 or x >= len(bins[0]):
+        return
+      if bins[y][x].label == -1 and len(bins[y][x].particles) > 0:
+        bins[y][x].label = label
+        offsets = [-1, 0, 1]
+        for xo in offsets:
+          for yo in offsets:
+            label_cluster(bins, x + xo, y + yo, label)
+    ######
+    num_bin_cols = int(math.ceil(
+        self._bmap.num_cols / self._config.CLUSTER_BIN_WIDTH))
+    num_bin_rows = int(math.ceil(
+        self._bmap.num_rows / self._config.CLUSTER_BIN_WIDTH))
+    # Create the bin 2D array.
+    bins = []
+    for j in range(num_bin_rows):
+      bins.append([])
+      for i in range(num_bin_cols):
+        bins[j].append(ClusterBin())
+    # Assign each particle to one of the bins.
+    for particle in self.particles:
+      bin_x = int(particle.x) / self._config.CLUSTER_BIN_WIDTH
+      bin_y = int(particle.y) / self._config.CLUSTER_BIN_WIDTH
+      bin_x = min(num_bin_cols - 1, max(0, bin_x))
+      bin_y = min(num_bin_rows - 1, max(0, bin_y))
+      bins[bin_y][bin_x].particles.append(particle)
+    # Assign each non-empty bin and all of its non-empty neighbors the same
+    # label.
+    next_cluster_id = 0
+    for j in range(num_bin_rows):
+      for i in range(num_bin_cols):
+        #print '{}, {} => {}'.format(j, i, len(bins[j][i].particles))
+        if bins[j][i].label == -1 and len(bins[j][i].particles) > 0:
+          #print '{}, {} => {}'.format(i, j, len(bins[j][i].particles))
+          label_cluster(bins, i, j, next_cluster_id)
+          next_cluster_id += 1
+    # Assign particles to a cluster ID based on the bin they're in.
+    for row in bins:
+      for cluster_bin in row:
+        for particle in cluster_bin.particles:
+          particle.cluster_id = cluster_bin.label
+    print next_cluster_id
+
   def _estimate_location(self):
     """Uses the current particle to estimate the location and heading.
 
@@ -224,6 +285,7 @@ class ParticleFilter(object):
     """
     # TODO: we should also do some connected-components clustering to make the
     # particles predict more than 1 location where applicable.
+    self._cluster_particles()
     total_weight = 0
     total_x = 0
     total_y = 0
@@ -236,4 +298,3 @@ class ParticleFilter(object):
     self.predicted_x = int(total_x / total_weight)
     self.predicted_y = int(total_y / total_weight)
     self.predicted_theta = total_theta / total_weight
-

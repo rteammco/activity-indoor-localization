@@ -6,7 +6,7 @@ from errlog import log_error
 from sim import Simulation
 
 
-class DisplayWindow():
+class DisplayWindow(object):
   """The GUI window that displays all particles and controls the timers.
 
   This class manages displaying all particles and the map image. It also calls
@@ -207,7 +207,13 @@ class DisplayWindow():
       y1 = particle.y - r / 2
       x2 = x1 + r
       y2 = y1 + r
-      self._canvas.create_oval(x1, y1, x2, y2, fill=self._PARTICLE_COLOR)
+      #self._canvas.create_oval(x1, y1, x2, y2, fill=self._PARTICLE_COLOR)
+      if particle.cluster_id % 3 == 0:
+        self._canvas.create_oval(x1, y1, x2, y2, fill='yellow')
+      elif particle.cluster_id % 3 == 1:
+        self._canvas.create_oval(x1, y1, x2, y2, fill='blue')
+      else:
+        self._canvas.create_oval(x1, y1, x2, y2, fill='red')
       # Draw an arrow to indicate the particle's orientation.
       c_x = (x2 + x1) / 2
       c_y = (y2 + y1) / 2
