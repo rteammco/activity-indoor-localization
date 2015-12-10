@@ -159,14 +159,13 @@ class Simulation(object):
     if not self._feed_fname:
       log_error('cannot save log: no feed file name provided')
       return
-    print 'pressed'
-    #try:
-    #  f = open(fname, 'w')
-    #  for log in self.sim_logs:
-    #    f.write(str(log) + '\n')
-    #  f.close()
-    #except:
-    #  log_error('failed writing to file "{}"'.format(fname))
+    try:
+      f = open(self._feed_fname, 'w')
+      for log in self.sim_logs:
+        f.write(str(log) + '\n')
+      f.close()
+    except:
+      log_error('failed writing to file "{}"'.format(self._feed_fname))
 
   def button_press(self, event):
     """Event hanlder function for a mouse button press.
