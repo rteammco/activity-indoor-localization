@@ -1,7 +1,7 @@
 import math
 
 
-class FeedDataPoint():
+class FeedDataPoint(object):
   """An object that contains data for a single log entry of the simulation.
 
   This object contains data for the 
@@ -61,7 +61,7 @@ class FeedDataPoint():
         round(self.ground_truth_theta, 5))
 
 
-class Simulation():
+class Simulation(object):
   """An object to handle simulation parameters and positioning.
 
   This class contains all of the simulation parameters for a user-controlled

@@ -1,7 +1,7 @@
 from errlog import log_error
 
 
-class BuildingMap():
+class BuildingMap(object):
   """This class contains the bitmap data for the building map.
   """
 
