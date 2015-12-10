@@ -52,12 +52,13 @@ class FeedDataPoint():
     Returns:
       A string contatining the data points to be written out to a feed file.
     """
-    region_probs = [0] * 6 # TODO: don't hard-code 6
+    region_probs = [0.0] * 6 # TODO: don't hard-code 6
     region_probs[self._region - 1] = 1.0
-    region_probs = ' '.join(region_probs)
+    region_probs = ' '.join(map(str, region_probs))
     return '{}\n+ {} {}\n! {} {} {}'.format(
-        region_probs, self._odometry, self._turn,
-        self._ground_truth_x, self._ground_truth_y, self.ground_truth_theta)
+        region_probs, self._odometry, round(self._turn, 5),
+        int(self._ground_truth_x), int(self._ground_truth_y),
+        round(self.ground_truth_theta, 5))
 
 
 class Simulation():
@@ -73,7 +74,7 @@ class Simulation():
   MOVE_SPEED = 1.2
   DIST_THRESH = 30
 
-  def __init__(self, building_map):
+  def __init__(self, building_map, log_rate=0):
     """Initializes the simulation parameters and the user position
 
     Sets the user position to the center of the map. By default, the simulation
@@ -82,6 +83,8 @@ class Simulation():
     Args:
       building_map: a BuildingMap object that contains the region definitions
           and the general size of the map.
+      log_rate: the number of update calls that need to go by before logging
+          occurs. If this value is left as 0, no logging happens.
     """
     self._bmap = building_map
     self.sim_locked = True
@@ -95,6 +98,8 @@ class Simulation():
     self.user_sim_theta = 0
     # Simulation log values.
     self._sim_logs = []
+    self._log_rate = log_rate
+    self._frame = 0
 
   def update(self):
     """Updates the simulation parameters based on the current user input.
@@ -106,13 +111,19 @@ class Simulation():
     dy = self.mouse_y - self.user_sim_y
     if self.mouse_down and not self.sim_locked:
       self.user_sim_theta = math.atan2(dy, dx)
-    # Update user position to 'walk' towards the mouse.
-    dx2 = dx * dx
-    dy2 = dy * dy
-    thresh2 = self.DIST_THRESH * self.DIST_THRESH
-    if self.mouse_down and not self.sim_locked and (dx2 + dy2) >= thresh2:
-      self.user_sim_x += self.MOVE_SPEED * math.cos(self.user_sim_theta)
-      self.user_sim_y += self.MOVE_SPEED * math.sin(self.user_sim_theta)
+    # If simulation is currently active (not locked and mouse is down)...
+    if self.mouse_down and not self.sim_locked:
+      # Update user position to 'walk' towards the mouse.
+      dx2 = dx * dx
+      dy2 = dy * dy
+      thresh2 = self.DIST_THRESH * self.DIST_THRESH
+      if (dx2 + dy2) >= thresh2:
+        self.user_sim_x += self.MOVE_SPEED * math.cos(self.user_sim_theta)
+        self.user_sim_y += self.MOVE_SPEED * math.sin(self.user_sim_theta)
+      # Update the simulation frame, and log the state when appropriate.
+      if self._log_rate > 0 and self._frame % self._log_rate == 0:
+        self._log_state()
+      self._frame += 1
 
   def _log_state(self):
     """Logs the state of the user for the current simulation step.
@@ -125,7 +136,7 @@ class Simulation():
     """
     dist_traveled = 0
     amount_turned = 0
-    region = 1 # ???
+    region = self._bmap.region_at(int(self.user_sim_x), int(self.user_sim_y))
     if len(self._sim_logs) > 0:
       prev_log = self._sim_logs[-1]
       dist_traveled = prev_log.dist_to(self.user_sim_x, self.user_sim_y)

@@ -60,7 +60,9 @@ class DisplayWindow():
     # Set up the simulation if the particle filter is not available.
     self._sim = None
     if not self._pf:
-      self._sim = Simulation(self._bmap)
+      seconds_per_log = self._UPDATE_INTERVAL_MS / 1000.0
+      log_rate = int(self._USER_CONTROL_FPS * seconds_per_log)
+      self._sim = Simulation(self._bmap, log_rate)
     # Try to load the background map image.
     try:
       self._background_img = Tk.PhotoImage(file=map_img_name)

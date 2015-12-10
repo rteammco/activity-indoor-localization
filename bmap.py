@@ -42,6 +42,21 @@ class BuildingMap():
     self.region_probs = [1.0] * self.NUMBER_OF_REGIONS
     self.region_probs[self.VOID_SPACE] = 0.0
 
+  def region_at(self, x, y):
+    """Returns the region ID at the given x, y position.
+
+    Args:
+      x: the (int) pixel x-position (col).
+      y: the (int) pixel y-position (row).
+
+    Returns:
+      The region ID at location (x, y) of the map. If the region is not defined
+      there (i.e. the coordinate is outside of the map's boundaries), returns 0.
+    """
+    if x < 0 or x >= self.num_cols or y < 0 or y >= self.num_rows:
+      return 0
+    return self._map_data[y][x]
+
   def probability_of(self, x, y):
     """Returns the probability at region x, y.
 
@@ -54,10 +69,7 @@ class BuildingMap():
       given coordinates are out of range of the map's dimensions, returns 0
       as the probability.
     """
-    if x < 0 or x >= self.num_cols or y < 0 or y >= self.num_rows:
-      return 0
-    region = self._map_data[y][x]
-    return self.region_probs[region]
+    return self.region_probs[self.region_at(x, y)]
 
   def set_probabilities(self, probabilities):
     """Sets the probabilities of each region.
