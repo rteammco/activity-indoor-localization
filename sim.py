@@ -10,6 +10,10 @@ class Simulation():
   the UI component can just control the timing and rendering.
   """
 
+  # Simulation parameters.
+  MOVE_SPEED = 1.2
+  DIST_THRESH = 30
+
   def __init__(self, map_width, map_height):
     """Initializes the simulation parameters and the user position
 
@@ -20,9 +24,6 @@ class Simulation():
       map_width: (int) the width of the simulation map.
       map_height: (int) the height of the simulation map.
     """
-    self._user_radius = 10
-    self._move_speed = 1.2
-    self._distance_thresh = 30
     self.sim_locked = True
     # Mouse state values.
     self.mouse_down = False
@@ -46,10 +47,10 @@ class Simulation():
     # Update user position to 'walk' towards the mouse.
     dx2 = dx * dx
     dy2 = dy * dy
-    thresh2 = self._distance_thresh * self._distance_thresh
+    thresh2 = self.DIST_THRESH * self.DIST_THRESH
     if self.mouse_down and not self.sim_locked and (dx2 + dy2) >= thresh2:
-      self.user_sim_x += self._move_speed * math.cos(self.user_sim_theta)
-      self.user_sim_y += self._move_speed * math.sin(self.user_sim_theta)
+      self.user_sim_x += self.MOVE_SPEED * math.cos(self.user_sim_theta)
+      self.user_sim_y += self.MOVE_SPEED * math.sin(self.user_sim_theta)
 
   def button_press(self, event):
     """Event hanlder function for a mouse button press.

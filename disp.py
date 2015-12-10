@@ -14,6 +14,8 @@ class DisplayWindow():
   localization process.
   """
 
+  # General display settings.
+  _TEXT_FONT = ('Arial', 22)
   # Display settings for particle filter.
   _PARTICLE_COLOR = 'yellow'
   _PARTICLE_RADIUS = 5
@@ -23,9 +25,10 @@ class DisplayWindow():
   # Display settings for user simulation.
   _SIM_USER_COLOR = 'green'
   _SIM_USER_RADIUS = 10
-  _SIM_MOVE_SPEED = 1.2
-  _SIM_DIST_THRESHOLD = 30
   _USER_CONTROL_FPS = 30
+  # Different modes for the map behavior.
+  _SIM_MODE = 0
+  _PF_MODE = 1
 
   def __init__(self, building_map, map_img_name=None, pf=None,
                feed_processor=None):
@@ -63,6 +66,7 @@ class DisplayWindow():
     except:
       log_error('failed to load image: {}'.format(map_img_name))
       self._background_img = None
+    self._mode = self._SIM_MODE if self._sim else self._PF_MODE
 
   def start_make_feed(self):
     """Starts the use-controlled simulation to generate a feed file.
@@ -127,7 +131,15 @@ class DisplayWindow():
     if self._background_img:
       self._canvas.create_image(
           0, 0, image=self._background_img, anchor='nw')
-  
+    if self._mode == self._SIM_MODE:
+      mode_text = 'Simulation Mode'
+    else:
+      mode_text = 'Particle Filter Mode'
+    text_y = 40
+    text_x = self._bmap.num_cols / 2
+    self._canvas.create_text(
+        text_x, text_y, font=self._TEXT_FONT, text=mode_text, fill='blue')
+
   def _render_user_sim(self):
     """Renders the simulation component to the screen.
 
@@ -146,11 +158,12 @@ class DisplayWindow():
         self._sim.user_sim_x, self._sim.user_sim_y, end_x, end_y, width=4,
         fill=self._SIM_USER_COLOR)
     # Draw a circle around the user to indicate the mouse activity distance.
-    x1 = self._sim.user_sim_x - self._SIM_DIST_THRESHOLD
-    y1 = self._sim.user_sim_y - self._SIM_DIST_THRESHOLD
-    r2 = 2 * self._SIM_DIST_THRESHOLD
+    x1 = self._sim.user_sim_x - self._sim.DIST_THRESH
+    y1 = self._sim.user_sim_y - self._sim.DIST_THRESH
+    r2 = 2 * self._sim.DIST_THRESH
     x2 = x1 + r2
     y2 = y1 + r2
+    # TODO: some of the colors can be moved up as global variables.
     self._canvas.create_oval(x1, y1, x2, y2, outline='red')
     # Draw a line from the user to the mouse if the mouse is pressed
     if self._sim.mouse_down:
@@ -160,15 +173,14 @@ class DisplayWindow():
     # Draw the text to display all pressed movement keys.
     text_y = self._bmap.num_rows - 50
     text_x = self._bmap.num_cols / 2
-    font = ('Arial', 22)
     if not self._sim.sim_locked:
       if self._sim.mouse_down:
         self._canvas.create_text(
-            text_x, text_y, font=font, text='Logging', fill='blue')
+            text_x, text_y, font=self._TEXT_FONT, text='Logging', fill='blue')
     else:
       locked_text = 'Simulation locked. Press ESC to unlock.'
       self._canvas.create_text(
-          text_x, text_y, font=font, text=locked_text, fill='red')
+          text_x, text_y, font=self._TEXT_FONT, text=locked_text, fill='red')
 
   def _render_particles(self, turn_angle):
     """Draws the particles and info from the particle filter to the screen.
@@ -223,7 +235,6 @@ class DisplayWindow():
     text_x = self._bmap.num_cols / 2
     max_index = self._bmap.region_probs.index(max(self._bmap.region_probs)) - 1
     regions = ['hall', 'stairs', 'elevator', 'door', 'sit', 'stand']
-    font = ('Arial', 22)
     padding = 100
     for i in range(6):
       name = regions[i]
@@ -233,8 +244,10 @@ class DisplayWindow():
         color = 'yellow'
       else:
         color = 'red'
-      self._canvas.create_text(x, text_y, font=font, text=name, fill=color)
-      self._canvas.create_text(x, text_y + 25, font=font, text=prob, fill=color)
+      self._canvas.create_text(
+          x, text_y, font=self._TEXT_FONT, text=name, fill=color)
+      self._canvas.create_text(
+          x, text_y + 25, font=self._TEXT_FONT, text=prob, fill=color)
     if turn_angle != 0:
       turn_angle = 'TURNING: ' + str(round(turn_angle, 3))
       turn_x = text_x + padding * 4
