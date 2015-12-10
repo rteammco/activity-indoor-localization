@@ -96,9 +96,11 @@ class ParticleFilter(object):
       particle = Particle(self._bmap.num_cols, self._bmap.num_rows)
       self.particles.append(particle)
     self._frame = 0
-    self.predicted_x = self._bmap.num_cols / 2
-    self.predicted_y = self._bmap.num_rows / 2
-    self.predicted_theta = 0
+    self.predicted_xs = [self._bmap.num_cols / 2]
+    self.predicted_ys = [self._bmap.num_rows / 2]
+    self.predicted_thetas = [0]
+    self.predicted_weights = [0]
+    self.best_predicted = 0
 
   def update(self, user_moving=True, turn_angle=0):
     """Updates the particle filter by one or more interation.
@@ -224,7 +226,12 @@ class ParticleFilter(object):
     """Assigns to each particle a cluster value based on its location.
 
     Particles close to each other will be placed into the same cluster. The
-    total number of clusters is also stored.
+    total number of clusters is also stored. This will set each particle's
+    'cluster_id' parameter to the id of the cluster they belong to. Cluster
+    IDs begin at 0.
+
+    Returns:
+      The number of clusters created.
     """
     # TODO: clean up this function.
     ######
@@ -275,7 +282,7 @@ class ParticleFilter(object):
       for cluster_bin in row:
         for particle in cluster_bin.particles:
           particle.cluster_id = cluster_bin.label
-    print next_cluster_id
+    return next_cluster_id
 
   def _estimate_location(self):
     """Uses the current particle to estimate the location and heading.
@@ -283,18 +290,28 @@ class ParticleFilter(object):
     The location and heading is computed as the weighted average of all
     particles.
     """
-    # TODO: we should also do some connected-components clustering to make the
-    # particles predict more than 1 location where applicable.
-    self._cluster_particles()
-    total_weight = 0
-    total_x = 0
-    total_y = 0
-    total_theta = 0
+    num_clusters = self._cluster_particles()
+    total_weights = [0] * num_clusters
+    total_xs = [0] * num_clusters
+    total_ys = [0] * num_clusters
+    total_thetas = [0] * num_clusters
     for particle in self.particles:
-      total_weight += particle.weight
-      total_x += particle.weight * particle.x
-      total_y += particle.weight * particle.y
-      total_theta += particle.weight * particle.theta
-    self.predicted_x = int(total_x / total_weight)
-    self.predicted_y = int(total_y / total_weight)
-    self.predicted_theta = total_theta / total_weight
+      cluster_id = particle.cluster_id
+      total_weights[cluster_id] += particle.weight
+      total_xs[cluster_id] += particle.weight * particle.x
+      total_ys[cluster_id] += particle.weight * particle.y
+      total_thetas[cluster_id] += particle.weight * particle.theta
+    self.predicted_xs = []
+    self.predicted_ys = []
+    self.predicted_thetas = []
+    self.predicted_weights = []
+    self.best_predicted = 0
+    max_weight = 0
+    for i in range(num_clusters):
+      if total_weights[i] > max_weight:
+        max_weight = total_weights[i]
+        self.best_predicted = i
+      self.predicted_xs.append(int(total_xs[i] / total_weights[i]))
+      self.predicted_ys.append(int(total_ys[i] / total_weights[i]))
+      self.predicted_thetas.append(int(total_thetas[i] / total_weights[i]))
+      self.predicted_weights.append(total_weights[i])

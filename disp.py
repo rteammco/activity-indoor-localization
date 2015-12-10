@@ -120,7 +120,7 @@ class DisplayWindow(object):
     # Update particle filter and render everything until the next frame.
     self._pf.update(turn_angle=turn_angle)
     self._render_main()
-    self._render_particles(turn_angle)
+    self._render_particle_filter(turn_angle)
     self._main_window.after(
         self._UPDATE_INTERVAL_MS, self._update_particle_filter)
 
@@ -185,7 +185,7 @@ class DisplayWindow(object):
       self._canvas.create_text(
           text_x, text_y, font=self._TEXT_FONT, text=locked_text, fill='red')
 
-  def _render_particles(self, turn_angle):
+  def _render_particle_filter(self, turn_angle):
     """Draws the particles and info from the particle filter to the screen.
 
     This should only be called if the particle filter is defined.
@@ -196,6 +196,11 @@ class DisplayWindow(object):
     if not self._pf:
       log_error('cannot render particle filter: variable _pf not defined.')
       return
+    self._render_pf_particles()
+    self._render_pf_location_estimates()
+    self._render_pf_info(turn_angle)
+
+  def _render_pf_particles(self):
     # Draw the particles.
     for particle in self._pf.particles:
       # Scale radius based on probability for visualization.
@@ -221,23 +226,29 @@ class DisplayWindow(object):
       end_y = c_y + r * math.sin(particle.theta)
       self._canvas.create_line(
           c_x, c_y, end_x, end_y, fill=self._PARTICLE_COLOR)
+
+  def _render_pf_location_estimates(self):
+    """Draws the particle location estimates (and ground truth if available).
+    """
     # Draw the particle filter's estimated location.
-    half_r = self._ESTIMATE_RADIUS / 2
-    thickness = self._ESTIMATE_RADIUS / 8 + 1
-    self._canvas.create_oval(
-        self._pf.predicted_x-half_r, self._pf.predicted_y-half_r,
-        self._pf.predicted_x+half_r, self._pf.predicted_y+half_r,
-        outline=self._ESTIMATE_COLOR, width=thickness)
-    # Draw the estimated orientation over the estimated location.
-    costheta = math.cos(self._pf.predicted_theta)
-    sintheta = math.sin(self._pf.predicted_theta)
-    start_x = self._pf.predicted_x + half_r * costheta
-    start_y = self._pf.predicted_y + half_r * sintheta
-    end_x = start_x + self._ESTIMATE_RADIUS * costheta
-    end_y = start_y + self._ESTIMATE_RADIUS * sintheta
-    self._canvas.create_line(
-        start_x, start_y, end_x, end_y,
-        fill=self._ESTIMATE_COLOR, width=thickness)
+    #half_r = self._ESTIMATE_RADIUS / 2
+    #thickness = self._ESTIMATE_RADIUS / 8 + 1
+    #self._canvas.create_oval(
+    #    self._pf.predicted_x-half_r, self._pf.predicted_y-half_r,
+    #    self._pf.predicted_x+half_r, self._pf.predicted_y+half_r,
+    #    outline=self._ESTIMATE_COLOR, width=thickness)
+    ## Draw the estimated orientation over the estimated location.
+    #costheta = math.cos(self._pf.predicted_theta)
+    #sintheta = math.sin(self._pf.predicted_theta)
+    #start_x = self._pf.predicted_x + half_r * costheta
+    #start_y = self._pf.predicted_y + half_r * sintheta
+    #end_x = start_x + self._ESTIMATE_RADIUS * costheta
+    #end_y = start_y + self._ESTIMATE_RADIUS * sintheta
+    #self._canvas.create_line(
+    #    start_x, start_y, end_x, end_y,
+    #    fill=self._ESTIMATE_COLOR, width=thickness)
+
+  def _render_pf_info(self, turn_angle):
     # Draw the probabilities and current max estimate.
     # TODO: don't hard-code the locations here!
     text_y = self._bmap.num_rows - 50
