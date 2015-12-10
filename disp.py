@@ -20,6 +20,7 @@ class DisplayWindow(object):
   _PARTICLE_COLOR = 'yellow'
   _PARTICLE_RADIUS = 5
   _ESTIMATE_COLOR = 'purple'
+  _BEST_ESTIMATE_COLOR = 'blue'
   _ESTIMATE_RADIUS = 30
   _UPDATE_INTERVAL_MS = 500
   # Display settings for user simulation.
@@ -201,7 +202,11 @@ class DisplayWindow(object):
     self._render_pf_info(turn_angle)
 
   def _render_pf_particles(self):
-    # Draw the particles.
+    """Draws all of the particle filter particles on the screen.
+
+    Particles with more weigth will be drawn bigger than those with smaller
+    weights.
+    """
     for particle in self._pf.particles:
       # Scale radius based on probability for visualization.
       r = self._PARTICLE_RADIUS
@@ -212,13 +217,7 @@ class DisplayWindow(object):
       y1 = particle.y - r / 2
       x2 = x1 + r
       y2 = y1 + r
-      #self._canvas.create_oval(x1, y1, x2, y2, fill=self._PARTICLE_COLOR)
-      if particle.cluster_id % 3 == 0:
-        self._canvas.create_oval(x1, y1, x2, y2, fill='yellow')
-      elif particle.cluster_id % 3 == 1:
-        self._canvas.create_oval(x1, y1, x2, y2, fill='blue')
-      else:
-        self._canvas.create_oval(x1, y1, x2, y2, fill='red')
+      self._canvas.create_oval(x1, y1, x2, y2, fill=self._PARTICLE_COLOR)
       # Draw an arrow to indicate the particle's orientation.
       c_x = (x2 + x1) / 2
       c_y = (y2 + y1) / 2
@@ -229,26 +228,52 @@ class DisplayWindow(object):
 
   def _render_pf_location_estimates(self):
     """Draws the particle location estimates (and ground truth if available).
+
+    One estimate will be drawn per cluster. The best-guess (the cluster with the
+    largest total weight) will have a different color than the other clusters.
+    The size of the cluster indicator will be scaled based on the cluster's
+    weight.
     """
-    # Draw the particle filter's estimated location.
-    #half_r = self._ESTIMATE_RADIUS / 2
-    #thickness = self._ESTIMATE_RADIUS / 8 + 1
-    #self._canvas.create_oval(
-    #    self._pf.predicted_x-half_r, self._pf.predicted_y-half_r,
-    #    self._pf.predicted_x+half_r, self._pf.predicted_y+half_r,
-    #    outline=self._ESTIMATE_COLOR, width=thickness)
-    ## Draw the estimated orientation over the estimated location.
-    #costheta = math.cos(self._pf.predicted_theta)
-    #sintheta = math.sin(self._pf.predicted_theta)
-    #start_x = self._pf.predicted_x + half_r * costheta
-    #start_y = self._pf.predicted_y + half_r * sintheta
-    #end_x = start_x + self._ESTIMATE_RADIUS * costheta
-    #end_y = start_y + self._ESTIMATE_RADIUS * sintheta
-    #self._canvas.create_line(
-    #    start_x, start_y, end_x, end_y,
-    #    fill=self._ESTIMATE_COLOR, width=thickness)
+    max_weight = self._pf.predicted_weights[self._pf.best_predicted]
+    for i in range(len(self._pf.predicted_weights)):
+      if i == self._pf.best_predicted:
+        color = self._BEST_ESTIMATE_COLOR
+      else:
+        color = self._ESTIMATE_COLOR
+      # Draw the predicted value for this cluster's estimate. The size of the
+      # estimate rendering is scaled based on the weight.
+      predicted_x = self._pf.predicted_xs[i]
+      predicted_y = self._pf.predicted_ys[i]
+      predicted_theta = self._pf.predicted_thetas[i]
+      predicted_weight = self._pf.predicted_weights[i]
+      scale = predicted_weight / max_weight
+      estimate_radius = int(math.ceil(scale * self._ESTIMATE_RADIUS / 2))
+      estimate_radius += self._ESTIMATE_RADIUS / 2
+      half_r = estimate_radius / 2
+      thickness = estimate_radius / 8 + 1
+      self._canvas.create_oval(predicted_x - half_r, predicted_y - half_r,
+          predicted_x + half_r, predicted_y + half_r, outline=color,
+          width=thickness)
+      # Draw the estimated orientation over the estimated location.
+      costheta = math.cos(predicted_theta)
+      sintheta = math.sin(predicted_theta)
+      start_x = predicted_x + half_r * costheta
+      start_y = predicted_y + half_r * sintheta
+      end_x = start_x + estimate_radius * costheta
+      end_y = start_y + estimate_radius * sintheta
+      self._canvas.create_line(start_x, start_y, end_x, end_y, fill=color,
+          width=thickness)
 
   def _render_pf_info(self, turn_angle):
+    """Draws text for the particle filter information on the screen.
+
+    The text includes the probabilities of all locations (the filter sensation
+    probabilities), and some of the current particle filter parameters.
+
+    Args:
+      turn_angle: the turning angle that will be displayed for visualization. If
+          its value is 0, it will not be shown.
+    """
     # Draw the probabilities and current max estimate.
     # TODO: don't hard-code the locations here!
     text_y = self._bmap.num_rows - 50
