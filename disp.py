@@ -119,6 +119,10 @@ class DisplayWindow(object):
     Also queues the next update after _UPDATE_INTERVAL_MS miliseconds. All
     updates happen here to all components of the particle filter program.
     """
+    if self._pf.is_finished():
+      self._pf.report()
+      self._main_window.destroy()
+      return
     # Update particle filter and render everything until the next frame.
     move_speed, turn_angle = self._pf.update()
     self._render_main()

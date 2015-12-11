@@ -105,6 +105,10 @@ class ParticleFilter(object):
     self.predicted_weights = [0]
     self.best_predicted = 0
     self.ground_truth = None
+    # Average sample error data.
+    self._best_dist_err_sum = 0
+    self._closest_dist_err_sum = 0
+    self._num_samples = 0
 
   def update(self):
     """Updates the particle filter by one or more interation.
@@ -352,6 +356,9 @@ class ParticleFilter(object):
         closest = i
     closest_dist_err, closest_theta_err = self._get_error_from_estimate(
         closest)
+    self._best_dist_err_sum += best_dist_err
+    self._closest_dist_err_sum += closest_dist_err
+    self._num_samples += 1
     return best_dist_err, best_theta_err, closest_dist_err, closest_theta_err
 
   def _get_error_from_estimate(self, prediction_index):
@@ -374,3 +381,23 @@ class ParticleFilter(object):
     if theta_err > math.pi:
       theta_err = round(theta_err - math.pi, 5)
     return dist_err, theta_err
+
+  def is_finished(self):
+    """Returns True if the simulation is finished.
+
+    Returns:
+      True if the simulation is finished, meaning that there is no more data
+      in the feed processor.
+    """
+    return not self._feed_processor.has_next()
+
+  def report(self):
+    """Prints the average errors collected from the simulation.
+    """
+    avg_best = 0
+    avg_closest = 0
+    if self._num_samples > 0:
+      avg_best = self._best_dist_err_sum / self._num_samples
+      avg_closest = self._closest_dist_err_sum / self._num_samples
+    print 'Average best cluster error: {}'.format(avg_best)
+    print 'Average closest cluster error: {}'.format(avg_closest)
