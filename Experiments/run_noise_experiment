@@ -29,7 +29,7 @@ do
   j=$(($i+1));
   cnoise=${noises[$i]};
   mnoise=${noises[$j]};
-  echo Probs: $cnoise / $mnoise;
+  echo Noise: $cnoise / $mnoise;
   for i in `seq 1 $num_trials`;
   do
     python run.py --config Data/pf_config.txt --feed Data/test_feed3.txt --map-data Data/map.txt --map-image Data/3ne.gif --classifier-noise $cnoise --motion-noise $mnoise --no-disp
