@@ -23,6 +23,8 @@ class DisplayWindow(object):
   _ESTIMATE_COLOR = 'purple'
   _BEST_ESTIMATE_COLOR = 'blue'
   _ESTIMATE_RADIUS = 30
+  _GROUND_TRUTH_COLOR = 'green'
+  _GROUND_TRUTH_RADIUS = 30
   _UPDATE_INTERVAL_MS = 500
   # Display settings for user simulation.
   _SIM_USER_COLOR = 'green'
@@ -116,7 +118,7 @@ class DisplayWindow(object):
     updates happen here to all components of the particle filter program.
     """
     # Update particle filter and render everything until the next frame.
-    turn_angle, move_speed = self._pf.update()
+    move_speed, turn_angle = self._pf.update()
     self._render_main()
     self._render_particle_filter(turn_angle)
     self._main_window.after(
@@ -198,8 +200,8 @@ class DisplayWindow(object):
       log_error('cannot render particle filter: variable _pf not defined.')
       return
     self._render_pf_particles()
-    self._render_pf_location_estimates()
     self._render_pf_ground_truth()
+    self._render_pf_location_estimates()
     self._render_pf_info(turn_angle)
 
   def _render_pf_particles(self):
@@ -230,7 +232,19 @@ class DisplayWindow(object):
   def _render_pf_ground_truth(self):
     """Draws the ground truth data for the particle filter if available.
     """
-    pass
+    if self._pf.ground_truth:
+      x, y, theta = self._pf.ground_truth
+      x1 = x - self._GROUND_TRUTH_RADIUS
+      y1 = y - self._GROUND_TRUTH_RADIUS
+      x2 = x + self._GROUND_TRUTH_RADIUS
+      y2 = y + self._GROUND_TRUTH_RADIUS
+      thickness = self._GROUND_TRUTH_RADIUS / 10
+      self._canvas.create_oval(x1, y1, x2, y2, width=thickness,
+          outline=self._GROUND_TRUTH_COLOR)
+      end_x = x + self._GROUND_TRUTH_RADIUS * 2 * math.cos(theta)
+      end_y = y + self._GROUND_TRUTH_RADIUS * 2 * math.sin(theta)
+      self._canvas.create_line(x, y, end_x, end_y, width=thickness,
+          fill=self._GROUND_TRUTH_COLOR)
 
   def _render_pf_location_estimates(self):
     """Draws the particle location estimates (and ground truth if available).

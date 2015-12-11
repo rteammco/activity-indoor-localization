@@ -104,20 +104,26 @@ class ParticleFilter(object):
     self.predicted_thetas = [0]
     self.predicted_weights = [0]
     self.best_predicted = 0
+    self.ground_truth = None
 
   def update(self):
     """Updates the particle filter by one or more interation.
 
     Repeats multiple times if the given PFConfig specifies more updates per
-    single frame interation.
+    single frame interation. This process also sets the ground truth for the
+    position if that is available from the feed processor.
     """
     probabilities, motion, ground_truth = self._feed_processor.get_next()
+    move_speed, turn_angle = 0, 0
+    if motion is not None:
+      move_speed, turn_angle = motion[0], motion[1]
+    self.ground_truth = ground_truth
     if probabilities is not None:
       self._bmap.set_probabilities(probabilities)
     for i in range(self._config.UPDATES_PER_FRAME):
       if motion is not None:
-        self._move_particles(self._config.PARTICLE_MOVE_SPEED) # TODO: use the speed
-        self._turn_particles(0) # TODO use the turn rate
+        self._move_particles(move_speed) # TODO: remove config.PARTICLE_MOVE_SPEED
+        self._turn_particles(turn_angle)
       if self._config.RANDOM_WALK_FREQUENCY != 0 and (
           self._frame % self._config.RANDOM_WALK_FREQUENCY) == 0:
         self._random_walk()
@@ -126,7 +132,7 @@ class ParticleFilter(object):
       self._resample(weight_sum)
       self._estimate_location()
       self._frame += 1
-    return 0, 0
+    return move_speed, turn_angle
 
   def _move_particles(self, amount):
     """Moves all particles forward by the given amount.
