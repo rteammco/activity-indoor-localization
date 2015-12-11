@@ -320,3 +320,57 @@ class ParticleFilter(object):
       self.predicted_ys.append(int(total_ys[i] / total_weights[i]))
       self.predicted_thetas.append(int(total_thetas[i] / total_weights[i]))
       self.predicted_weights.append(total_weights[i])
+  
+  def get_estimate_errors(self):
+    """Computes the error from the predicted location and the ground truth.
+
+    Determines the error in terms of distance and orientation. One error is
+    computed from the best cluster, and the other error is computed from the
+    cluster closest to the ground truth. These may be the same value. If ground
+    truth is not available, the error is not computed and -1 is returned for all
+    values.
+
+    Returns:
+      Four values: the best predicted cluster's distance and theta errors,
+      and the distance and theta errors of the cluster that is closest in terms
+      of distance to the ground truth. All returned values are absolute value
+      errors.
+    """
+    if not self.ground_truth:
+      return -1, -1, -1, -1
+    best_dist_err, best_theta_err = self._get_error_from_estimate(
+        self.best_predicted)
+    # Find the closest cluster center to the ground truth.
+    closest = 0
+    closest_dist2 = -1
+    for i in range(len(self.predicted_xs)):
+      dx = self.predicted_xs[i] - self.ground_truth[0]
+      dy = self.predicted_ys[i] - self.ground_truth[1]
+      dist2 = dx * dx + dy * dy
+      if closest_dist2 == -1 or dist2 < closest_dist2:
+        closest_dist2 = dist2
+        closest = i
+    closest_dist_err, closest_theta_err = self._get_error_from_estimate(
+        closest)
+    return best_dist_err, best_theta_err, closest_dist_err, closest_theta_err
+
+  def _get_error_from_estimate(self, prediction_index):
+    """Returns the distance and theta errors of the given prediction.
+
+    The ground truth is used to determine the prediction error. If the ground
+    truth for this iteration is not availabe, -1 is returned for both errors.
+
+    Returns:
+      Two values: the given predictions distance and theta errors. Both values
+      are absolute value errors.
+    """
+    if not self.ground_truth or prediction_index >= len(self.predicted_xs):
+      return -1, -1
+    true_x, true_y, true_theta = self.ground_truth
+    dx = self.predicted_xs[prediction_index] - true_x
+    dy = self.predicted_ys[prediction_index] - true_y
+    dist_err = int(math.sqrt(dx * dx + dy * dy))
+    theta_err = abs(true_theta - self.predicted_thetas[prediction_index])
+    if theta_err > math.pi:
+      theta_err = round(theta_err - math.pi, 5)
+    return dist_err, theta_err

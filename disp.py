@@ -320,9 +320,11 @@ class DisplayWindow(object):
       self._canvas.create_text(turn_x, text_y + 12, font=self._TEXT_FONT,
           text=turn_angle, fill='green')
     # Render other information about the particle filter.
-    err_dist = '{} meters error'.format(0)
+    prediction_errors = self._pf.get_estimate_errors()
+    best_err_dist = '{} error (best cluster)'.format(prediction_errors[0])
+    closest_err_dist = '{} error (closest cluster)'.format(prediction_errors[2])
     num_clusters = '{} clusters'.format(len(self._pf.predicted_weights))
-    self._render_info_text([err_dist, num_clusters])
+    self._render_info_text([best_err_dist, closest_err_dist, num_clusters])
 
   def _render_info_text(self, info_strings):
     """Renders the given list of info strings on the screen.
