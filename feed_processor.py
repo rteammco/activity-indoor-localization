@@ -1,3 +1,6 @@
+import math
+import random
+
 from errlog import log_error
 
 
@@ -5,7 +8,8 @@ class FeedProcessor(object):
   """Processes a classifier feed data file to provide easy updates.
   """
 
-  def __init__(self, feed_file_name, loop_feed=True):
+  def __init__(self, feed_file_name, loop_feed=True, classifier_noise=0.0,
+      motion_noise=0.0):
     """Reads the given filename and tries to parse the classifier feed.
     
     Args:
@@ -19,16 +23,17 @@ class FeedProcessor(object):
       loop_feed: (optional) set to False if this feed shouldn't loop around.
           Otherwise, when the data stream runs out, it will loop from the
           beginning.
-    
-    Returns:
-      A 2D list floats that contains the probabilities for each region for every
-      iteration interval (frame). These probabilities are intended to be given
-      one at a time to the BuildingMap object to update its region probabilites.
+      classifier_noise: added noise of the classifier between 0 and 1. A higher
+          value means more random noise.
+      motion_noise: the added noise of the odometry and turn rate. A higher
+          value means more random noise.
     """
     self._probability_list = []
     self._motions = []
     self._ground_truths = []
     self._loop_feed = loop_feed
+    self._classifier_noise = classifier_noise
+    self._motion_noise = motion_noise
     try:
       f = open(feed_file_name, 'r')
       for line in f:
@@ -89,7 +94,11 @@ class FeedProcessor(object):
     """
     if self._num_feeds > self._next_index:
       probs = self._probability_list[self._next_index]
+      if self._classifier_noise > 0:
+        probs = self._add_classifier_noise(probs, self._classifier_noise)
       motion = self._motions[self._next_index]
+      if self._motion_noise > 0:
+        motion = self._add_motion_noise(motion, self._motion_noise)
       ground_truth = self._ground_truths[self._next_index]
       self._next_index += 1
       # If index is out of bounds, reset if we are looping the classifier feed.
@@ -98,3 +107,39 @@ class FeedProcessor(object):
       return probs, motion, ground_truth
     else:
       return None, None, None
+
+  def _add_motion_noise(self, motion, motion_noise):
+    # TODO comments
+    if motion is None:
+      return None
+    move_speed, turn_speed = motion
+    # Add noise to the odometry.
+    noise = random.random() * motion_noise
+    move_noise = random.choice([1, -1]) * noise * move_speed
+    move_speed = move_speed + move_noise
+    # Add noise to the turning rate.
+    noise = random.random() * motion_noise
+    turn_noise = random.choice([1, -1]) * noise * math.pi / 2
+    turn_speed = turn_speed + turn_noise
+    # Return the noisy values.
+    return move_speed, turn_speed
+
+  def _add_classifier_noise(self, region_probs, classifier_noise):
+    """Adds random classifier noise to the given probabilities.
+    """
+    # TODO comments
+    # Add random noise to the region probabilities.
+    for i in range(len(region_probs)):
+      noise = abs(random.normalvariate(0, classifier_noise))
+      if region_probs[i] == 1: # if this is the highest, subtract. TODO: max?
+        region_probs[i] = abs(region_probs[i] - noise)
+      else:
+        region_probs[i] += noise
+    # Normalize the noisy vector.
+    norm = 0
+    for prob in region_probs:
+      norm += prob * prob
+    norm = math.sqrt(norm)
+    for i in range(len(region_probs)):
+      region_probs[i] /= norm
+    return region_probs
