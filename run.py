@@ -34,7 +34,10 @@ def get_pf_config(config_file=None):
     'RANDOM_WALK_FREQUENCY': 3,
     'RANDOM_WALK_MAX_DIST': 80,
     'RANDOM_WALK_MAX_THETA': math.pi / 4,
-    'WEIGHT_DECAY_RATE': 1.0
+    'WEIGHT_DECAY_RATE': 1.0,
+    'START_X': None,
+    'START_Y': None,
+    'START_THETA': None
   }
   if config_file:
     try:
@@ -56,6 +59,9 @@ def get_pf_config(config_file=None):
   config.RANDOM_WALK_MAX_DIST = config_values['RANDOM_WALK_MAX_DIST']
   config.RANDOM_WALK_MAX_THETA = config_values['RANDOM_WALK_MAX_THETA']
   config.WEIGHT_DECAY_RATE = config_values['WEIGHT_DECAY_RATE']
+  config.START_X = config_values['START_X']
+  config.START_Y = config_values['START_Y']
+  config.START_THETA = config_values['START_THETA']
   return config
 
 if __name__ == '__main__':
