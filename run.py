@@ -85,13 +85,16 @@ if __name__ == '__main__':
   parser.add_argument(
       '--no-disp', dest='no_disp', action='store_true',
       help='Set this flag to disable visualizations (it runs faster).')
-  # TODO: these noise params should go into a config file.
+  # TODO: these noise and test params should go into a config file.
   parser.add_argument(
       '--classifier-noise', dest='c_noise', required=False, type=float,
       help='The amount of classifier noise to add to the particlefilter.')
   parser.add_argument(
       '--motion-noise', dest='m_noise', required=False, type=float,
       help='The amount of motion noise to add to the particle filter.')
+  parser.add_argument(
+      '--ignore-regions', dest='ignore_regions', action='store_true',
+      help='Set this flag to disable using the region probabilities.')
   args = parser.parse_args()
   config = get_pf_config(args.config_file)
   building_map = BuildingMap(args.map_data)
@@ -105,7 +108,8 @@ if __name__ == '__main__':
     display_on = False if args.no_disp else True
     c_noise = args.c_noise if args.c_noise else 0
     m_noise = args.m_noise if args.m_noise else 0
-    feed_processor = FeedProcessor(args.feed, args.loop_feed, c_noise, m_noise)
+    feed_processor = FeedProcessor(args.feed, args.loop_feed, c_noise, m_noise,
+        ignore_regions=args.ignore_regions)
     pf = ParticleFilter(config, building_map, feed_processor)
     w = DisplayWindow(building_map, args.map_image, pf, display=display_on)
     w.start_particle_filter()
