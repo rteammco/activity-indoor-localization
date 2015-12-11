@@ -1,11 +1,17 @@
 #!/bin/bash
 
+# Parameters
+feed_file=Data/test_feed3.txt
+config_file=Data/pf_config.txt
+map_file=Data/map.txt
+map_img=Data/3ne.gif
+
 if [ "$1" == "sim" ]; then
   echo "Running in simulation mode."
-  python run.py --map-data Data/map.txt --feed Data/test_feed3.txt --map-image Data/3ne.gif --make-feed
+  python run.py --map-data $map_file --feed $feed_file --map-image $map_img --make-feed
 elif [ "$1" == "pf" ]; then
   echo "Running in particle filter mode."
-  python run.py --config Data/pf_config.txt --feed Data/test_feed3.txt --map-data Data/map.txt --map-image Data/3ne.gif --classifier-noise 0.2 --motion-noise 0.5
+  python run.py --config $config_file --feed $feed_file --map-data $map_file --map-image $map_img --classifier-noise 0.2 --motion-noise 0.2
 else
   echo "Please specify mode: 'pf' or 'sim'."
 fi

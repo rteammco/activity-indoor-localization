@@ -82,6 +82,9 @@ if __name__ == '__main__':
   parser.add_argument(
       '--make-feed', dest='make_feed', action='store_true',
       help='Set this flag to collect feed data from user control.')
+  parser.add_argument(
+      '--no-disp', dest='no_disp', action='store_true',
+      help='Set this flag to disable visualizations (it runs faster).')
   # TODO: these noise params should go into a config file.
   parser.add_argument(
       '--classifier-noise', dest='c_noise', required=False, type=float,
@@ -91,17 +94,18 @@ if __name__ == '__main__':
       help='The amount of motion noise to add to the particle filter.')
   args = parser.parse_args()
   config = get_pf_config(args.config_file)
-  # Start the simulation.
   building_map = BuildingMap(args.map_data)
+  # If this is a feed generator run, start the user simulator.
   if args.make_feed:
     simulation = Simulation(building_map, args.feed)
     w = DisplayWindow(building_map, args.map_image, sim=simulation)
     w.start_make_feed()
+  # Otherwise, run the particle filter on an existing feed.
   else:
+    display_on = False if args.no_disp else True
     c_noise = args.c_noise if args.c_noise else 0
     m_noise = args.m_noise if args.m_noise else 0
     feed_processor = FeedProcessor(args.feed, args.loop_feed, c_noise, m_noise)
     pf = ParticleFilter(config, building_map, feed_processor)
-    w = DisplayWindow(
-        building_map, args.map_image, pf, feed_processor)
+    w = DisplayWindow(building_map, args.map_image, pf, display=display_on)
     w.start_particle_filter()

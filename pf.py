@@ -105,6 +105,8 @@ class ParticleFilter(object):
     self.predicted_weights = [0]
     self.best_predicted = 0
     self.ground_truth = None
+    # Last frame's prediction errors.
+    self.prediction_errors = (-1, -1, -1, -1)
     # Average sample error data.
     self._best_dist_err_sum = 0
     self._closest_dist_err_sum = 0
@@ -136,6 +138,7 @@ class ParticleFilter(object):
       self._resample(weight_sum)
       self._estimate_location()
       self._frame += 1
+    self._compute_prediction_errors()
     return move_speed, turn_angle
 
   def _move_particles(self, amount):
@@ -325,23 +328,18 @@ class ParticleFilter(object):
       self.predicted_thetas.append(int(total_thetas[i] / total_weights[i]))
       self.predicted_weights.append(total_weights[i])
   
-  def get_estimate_errors(self):
+  def _compute_prediction_errors(self):
     """Computes the error from the predicted location and the ground truth.
 
     Determines the error in terms of distance and orientation. One error is
     computed from the best cluster, and the other error is computed from the
     cluster closest to the ground truth. These may be the same value. If ground
-    truth is not available, the error is not computed and -1 is returned for all
-    values.
-
-    Returns:
-      Four values: the best predicted cluster's distance and theta errors,
-      and the distance and theta errors of the cluster that is closest in terms
-      of distance to the ground truth. All returned values are absolute value
-      errors.
+    truth is not available, the error is not computed and -1 is set for all
+    values. These error values are saved for reference by the rendering system.
     """
     if not self.ground_truth:
-      return -1, -1, -1, -1
+      self.prediction_errors = (-1, -1, -1, -1)
+      return
     best_dist_err, best_theta_err = self._get_error_from_estimate(
         self.best_predicted)
     # Find the closest cluster center to the ground truth.
@@ -359,7 +357,8 @@ class ParticleFilter(object):
     self._best_dist_err_sum += best_dist_err
     self._closest_dist_err_sum += closest_dist_err
     self._num_samples += 1
-    return best_dist_err, best_theta_err, closest_dist_err, closest_theta_err
+    self.prediction_errors = (best_dist_err, best_theta_err, closest_dist_err,
+        closest_theta_err)
 
   def _get_error_from_estimate(self, prediction_index):
     """Returns the distance and theta errors of the given prediction.

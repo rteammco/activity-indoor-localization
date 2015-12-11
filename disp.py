@@ -33,7 +33,8 @@ class DisplayWindow(object):
   _SIM_MODE = 0
   _PF_MODE = 1
 
-  def __init__(self, building_map, map_img_name=None, pf=None, sim=None):
+  def __init__(self, building_map, map_img_name=None, pf=None, sim=None,
+      display=True):
     """Initializes the displayed window and the canvas to draw with.
 
     Args:
@@ -50,10 +51,14 @@ class DisplayWindow(object):
       sim: a Simulation object with all parameters set up. This object will be
           used to run a simulation mode for feed file generation when the
           particle filter is not provided.
+      display: if set to False, all rendering will be disabled. This will make
+          the particle filter mode run faster, but the user will not see any
+          visualizations on the window.
     """
     self._bmap = building_map
     self._pf = pf
     self._sim = sim
+    self._display_on = display
     self._main_window = Tk.Tk()
     self._main_window.title('Particle Filter')
     self._canvas = Tk.Canvas(
@@ -123,12 +128,17 @@ class DisplayWindow(object):
       self._pf.report()
       self._main_window.destroy()
       return
-    # Update particle filter and render everything until the next frame.
+    # Update particle filter and render everything until the next frame. If
+    # visualizations are turned off, call the next update immediately and don't
+    # render anything.
     move_speed, turn_angle = self._pf.update()
-    self._render_main()
-    self._render_particle_filter(turn_angle)
-    self._main_window.after(
-        self._UPDATE_INTERVAL_MS, self._update_particle_filter)
+    if self._display_on:
+      self._render_main()
+      self._render_particle_filter(turn_angle)
+      self._main_window.after(
+          self._UPDATE_INTERVAL_MS, self._update_particle_filter)
+    else:
+      self._main_window.after(0, self._update_particle_filter)
 
   def _render_main(self):
     """Clears the screen and draws the map image.
@@ -326,7 +336,7 @@ class DisplayWindow(object):
       self._canvas.create_text(turn_x, text_y + 12, font=self._TEXT_FONT,
           text=turn_angle, fill='green')
     # Render other information about the particle filter.
-    prediction_errors = self._pf.get_estimate_errors()
+    prediction_errors = self._pf.prediction_errors
     best_err_dist = '{} error (best cluster)'.format(prediction_errors[0])
     closest_err_dist = '{} error (closest cluster)'.format(prediction_errors[2])
     num_clusters = '{} clusters'.format(len(self._pf.predicted_weights))
