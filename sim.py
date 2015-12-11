@@ -1,4 +1,5 @@
 import math
+import random
 
 from errlog import log_error
 
@@ -48,19 +49,56 @@ class FeedDataPoint(object):
     dy = self._ground_truth_y - y
     return int(round(math.sqrt(dx * dx + dy * dy)))
 
-  def __str__(self):
-    """Returns a string representation of this object.
+  def get_string(self, classifier_noise, motion_noise):
+    """Returns a string representation of this object with possible noise.
+
+    Args:
+      classifier_noise: a value between 0 and 1 that will specify how much
+          noise is randomly added to the probabilities before it is returned.
+      motion_noise: a value between 0 and 1 that will specify how much noise is
+          randomly added to the distance moved and turn rate values.
 
     Returns:
       A string contatining the data points to be written out to a feed file.
     """
     region_probs = [0.0] * 6 # TODO: don't hard-code 6
     region_probs[self._region - 1] = 1.0
+    # Add random noise to the region probabilities.
+    for i in range(len(region_probs)):
+      noise = abs(random.normalvariate(0, classifier_noise))
+      if i == (self._region - 1):
+        region_probs[i] = abs(region_probs[i] - noise)
+      else:
+        region_probs[i] += noise
+    # Normalize the noisy vector.
+    norm = 0
+    for prob in region_probs:
+      norm += prob * prob
+    norm = math.sqrt(norm)
+    for i in range(len(region_probs)):
+      region_probs[i] /= norm
+    # Convert the vector to a string for export.
     region_probs = ' '.join(map(str, region_probs))
-    return '{}\n+ {} {}\n! {} {} {}'.format(
-        region_probs, self._odometry, round(self._turn, 5),
-        int(self._ground_truth_x), int(self._ground_truth_y),
+    # Add random noise to odometry.
+    noise = random.random() * motion_noise
+    odometry_noise = random.choice([1, -1]) * noise * self._odometry
+    odometry = self._odometry + odometry_noise
+    # Add random noise to turn rate.
+    noise = random.random() * motion_noise
+    turn_noise = random.choice([1, -1]) * noise * math.pi / 2
+    turn = self._turn + turn_noise
+    # Put all the noisy stuff together and return everything.
+    return '{}\n+ {} {}\n! {} {} {}'.format(region_probs, int(odometry),
+        round(turn, 5), int(self._ground_truth_x), int(self._ground_truth_y),
         round(self.ground_truth_theta, 5))
+
+  def __str__(self):
+    """Returns a string representation of this object.
+
+    Returns:
+      A string contatining the exact data points (with no noise).
+    """
+    return self.get_string(0, 0)
 
 
 class Simulation(object):
@@ -76,7 +114,8 @@ class Simulation(object):
   MOVE_SPEED = 1.2
   DIST_THRESH = 30
 
-  def __init__(self, building_map, feed_fname, log_rate=0):
+  def __init__(self, building_map, feed_fname, log_rate=0,
+      classifier_noise=0.0, motion_noise=0.0):
     """Initializes the simulation parameters and the user position
 
     Sets the user position to the center of the map. By default, the simulation
@@ -89,6 +128,10 @@ class Simulation(object):
           saved to if the save function is called.
       log_rate: the number of update calls that need to go by before logging
           occurs. If this value is left as 0, no logging happens.
+      classifier_noise: the simulated noise of the classifier between 0 and 1.
+          A higher value means more random noise.
+      motion_noise: the simulated noise of the odometry and turn rate. A higher
+          value means more random noise.
     """
     self._bmap = building_map
     self._feed_fname = feed_fname
@@ -103,8 +146,11 @@ class Simulation(object):
     self.user_sim_theta = 0
     # Simulation log values.
     self.sim_logs = []
-    self._log_rate = log_rate
+    self.log_rate = log_rate
     self._frame = 0
+    # Export noise values.
+    self._classifier_noise = classifier_noise
+    self._motion_noise = motion_noise
 
   def update(self):
     """Updates the simulation parameters based on the current user input.
@@ -126,7 +172,7 @@ class Simulation(object):
         self.user_sim_x += self.MOVE_SPEED * math.cos(self.user_sim_theta)
         self.user_sim_y += self.MOVE_SPEED * math.sin(self.user_sim_theta)
       # Update the simulation frame, and log the state when appropriate.
-      if self._log_rate > 0 and self._frame % self._log_rate == 0:
+      if self.log_rate > 0 and self._frame % self.log_rate == 0:
         self._log_state()
       self._frame += 1
 
@@ -149,6 +195,10 @@ class Simulation(object):
     self.sim_logs.append(FeedDataPoint(region, dist_traveled, amount_turned,
         self.user_sim_x, self.user_sim_y, self.user_sim_theta))
     print str(self.sim_logs[-1])
+    print '----'
+    print self.sim_logs[-1].get_string(self._classifier_noise, self._motion_noise)
+    print '==================='
+    print '==================='
 
   def save_logs(self):
     """Saves the logged data to the given file.
@@ -162,7 +212,8 @@ class Simulation(object):
     try:
       f = open(self._feed_fname, 'w')
       for log in self.sim_logs:
-        f.write(str(log) + '\n')
+        f.write(log.get_string(
+            self._classifier_noise, self._motion_noise) + '\n')
       f.close()
     except:
       log_error('failed writing to file "{}"'.format(self._feed_fname))

@@ -6,6 +6,7 @@ from disp import DisplayWindow
 from errlog import log_error
 from feed_processor import FeedProcessor
 from pf import ParticleFilter, PFConfig
+from sim import Simulation
 
 
 def get_pf_config(config_file=None):
@@ -81,12 +82,23 @@ if __name__ == '__main__':
   parser.add_argument(
       '--make-feed', dest='make_feed', action='store_true',
       help='Set this flag to collect feed data from user control.')
+  # TODO: these noise params should go into a config file.
+  parser.add_argument(
+      '--sim-classifier-noise', dest='c_noise', required=False, type=float,
+      help='The amount of classifier noise the simulator will generate.')
+  parser.add_argument(
+      '--sim-motion-noise', dest='m_noise', required=False, type=float,
+      help='The amount of motion noise the simulator will generate.')
   args = parser.parse_args()
   config = get_pf_config(args.config_file)
   # Start the simulation.
   building_map = BuildingMap(args.map_data)
   if args.make_feed:
-    w = DisplayWindow(building_map, args.map_image, feed_fname=args.feed)
+    c_noise = args.c_noise if args.c_noise else 0
+    m_noise = args.m_noise if args.m_noise else 0
+    simulation = Simulation(building_map, args.feed,
+        classifier_noise=c_noise, motion_noise=m_noise)
+    w = DisplayWindow(building_map, args.map_image, sim=simulation)
     w.start_make_feed()
   else:
     feed_processor = FeedProcessor(args.feed, args.loop_feed)

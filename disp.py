@@ -3,7 +3,6 @@ import time
 import Tkinter as Tk
 
 from errlog import log_error
-from sim import Simulation
 
 
 class DisplayWindow(object):
@@ -34,7 +33,7 @@ class DisplayWindow(object):
   _SIM_MODE = 0
   _PF_MODE = 1
 
-  def __init__(self, building_map, map_img_name=None, pf=None, feed_fname=''):
+  def __init__(self, building_map, map_img_name=None, pf=None, sim=None):
     """Initializes the displayed window and the canvas to draw with.
 
     Args:
@@ -48,9 +47,13 @@ class DisplayWindow(object):
       pf: a ParticleFilter object with all parameters set up. This object's
           update() function will be called every frame, and its particles will
           be used to visualize the map state.
+      sim: a Simulation object with all parameters set up. This object will be
+          used to run a simulation mode for feed file generation when the
+          particle filter is not provided.
     """
     self._bmap = building_map
     self._pf = pf
+    self._sim = sim
     self._main_window = Tk.Tk()
     self._main_window.title('Particle Filter')
     self._canvas = Tk.Canvas(
@@ -58,11 +61,10 @@ class DisplayWindow(object):
         height=self._bmap.num_rows, background='white')
     self._canvas.pack()
     # Set up the simulation if the particle filter is not available.
-    self._sim = None
-    if not self._pf:
+    if not self._pf and self._sim:
       seconds_per_log = self._UPDATE_INTERVAL_MS / 1000.0
       log_rate = int(self._USER_CONTROL_FPS * seconds_per_log)
-      self._sim = Simulation(self._bmap, feed_fname, log_rate)
+      self._sim.log_rate = log_rate
     # Try to load the background map image.
     try:
       self._background_img = Tk.PhotoImage(file=map_img_name)

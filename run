@@ -2,7 +2,7 @@
 
 if [ "$1" == "sim" ]; then
   echo "Running in simulation mode."
-  python run.py --map-data Data/map.txt --feed Data/test_feed3.txt --map-image Data/3ne.gif --make-feed
+  python run.py --map-data Data/map.txt --feed Data/test_feed3.txt --map-image Data/3ne.gif --make-feed --sim-classifier-noise 0.2 --sim-motion-noise 0.2
 elif [ "$1" == "pf" ]; then
   echo "Running in particle filter mode."
   python run.py --config Data/pf_config.txt --feed Data/test_feed3.txt --map-data Data/map.txt --map-image Data/3ne.gif
