@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Runs a series of experiments with different particle filter configurations.
+
+num_trials=10
+
+cnoise=0.2
+startx=174
+starty=104
+startt=2.91479
+
+rw_max_dist=25
+rw_max_theta=0.26179917
+weight_decay=0.8
+
+motion_noises=(
+  0.0
+  0.1
+  0.2
+  0.3
+  0.4
+  0.5
+)
+
+particle_counts=(
+  100
+  500
+  1000
+  1500
+  2000
+)
+
+for num in ${particle_counts[@]};
+do
+  echo ::::: $num particles :::::
+  for val in ${motion_noises[@]};
+  do
+    echo $val motion noise
+    echo NUM_PARTICLES = $num >> temp_config
+    echo UPDATES_PER_FRAME = 1 >> temp_config
+    echo PARTICLE_MOVE_SPEED = 10 >> temp_config
+    echo RANDOM_WALK_FREQUENCY = 1 >> temp_config
+    echo RANDOM_WALK_MAX_DIST = $rw_max_dist >> temp_config
+    echo RANDOM_WALK_MAX_THETA = $rw_max_theta >> temp_config
+    echo WEIGHT_DECAY_RATE = $weight_decay >> temp_config
+    echo START_X = $startx >> temp_config
+    echo START_Y = $starty >> temp_config
+    echo START_THETA = $startt >> temp_config
+    cd ..
+    for i in `seq 1 $num_trials`;
+    do
+      echo '  motion only'
+      python run.py --config Experiments/temp_config --feed Data/test_feed3.txt --map-data Data/map.txt --map-image Data/3ne.gif --motion-noise $val --ignore-regions --no-disp
+      echo '  motion + regions'
+      python run.py --config Experiments/temp_config --feed Data/test_feed3.txt --map-data Data/map.txt --map-image Data/3ne.gif --classifier-noise $cnoise --motion-noise $val --no-disp
+    done
+    cd Experiments
+    rm temp_config
+  done
+done

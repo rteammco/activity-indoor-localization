@@ -18,6 +18,9 @@ class PFConfig(object):
   RANDOM_WALK_MAX_THETA = math.pi / 4
   WEIGHT_DECAY_RATE = 1.0
   CLUSTER_BIN_WIDTH = 10
+  START_X = None
+  START_Y = None
+  START_THETA = None
 
 
 class Particle(object):
@@ -98,6 +101,16 @@ class ParticleFilter(object):
     for i in range(self._config.NUM_PARTICLES):
       particle = Particle(self._bmap.num_cols, self._bmap.num_rows)
       self.particles.append(particle)
+    # If configured so that particles start in a certain area, reset them.
+    if self._config.START_X and self._config.START_Y:
+      for p in self.particles:
+        p.x = self._config.START_X
+        p.y = self._config.START_Y
+    # If configured so that particles start at a certain orientation, set that.
+    if self._config.START_THETA:
+      for p in self.particles:
+        p.theta = self._config.START_THETA
+    # Set simulation prediction values.
     self._frame = 0
     self.predicted_xs = [self._bmap.num_cols / 2]
     self.predicted_ys = [self._bmap.num_rows / 2]

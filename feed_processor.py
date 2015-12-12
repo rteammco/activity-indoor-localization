@@ -9,7 +9,7 @@ class FeedProcessor(object):
   """
 
   def __init__(self, feed_file_name, loop_feed=True, classifier_noise=0.0,
-      motion_noise=0.0):
+      motion_noise=0.0, ignore_regions=False):
     """Reads the given filename and tries to parse the classifier feed.
     
     Args:
@@ -27,6 +27,9 @@ class FeedProcessor(object):
           value means more random noise.
       motion_noise: the added noise of the odometry and turn rate. A higher
           value means more random noise.
+      ignore_regions: set to true to ignore region probabilities (set them all
+          to be equal) and only update based on motion data. This is useful for
+          comparing with an odometry-and-turn-only method.
     """
     self._probability_list = []
     self._motions = []
@@ -59,10 +62,15 @@ class FeedProcessor(object):
             ground_truth = int(line[0]), int(line[1]), float(line[2])
             if len(self._ground_truths) > 0:
               self._ground_truths[-1] = ground_truth
-        # Otherwise add the probabilities and a turn angle of 0.
+        # Otherwise add the probabilities and initialize the motion and ground
+        # truth values at that point to None.
         else:
           line = line.split()
-          self._probability_list.append(map(float, line))
+          if ignore_regions:
+            count = len(line)
+            self._probability_list.append([1.0 / count] * count)
+          else:
+            self._probability_list.append(map(float, line))
           self._motions.append(None)
           self._ground_truths.append(None)
     except:
