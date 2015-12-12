@@ -162,9 +162,23 @@ class DisplayWindow(object):
         text_x, text_y, font=self._TEXT_FONT, text=mode_text, fill='blue')
     # Draw the scale (pixels to meter).
     scale_x = self._bmap.num_cols - 20
-    scale_y = self._bmap.num_rows - 20
-    self._canvas.create_line(scale_x, scale_y,
-        scale_x - 5 * self._PIXELS_PER_METER, scale_y, fill='black')
+    scale_y = self._bmap.num_rows - 50
+    # Create the 5 meter scale line.
+    five_meters = 5 * self._PIXELS_PER_METER
+    self._canvas.create_line(
+        scale_x, scale_y, scale_x - five_meters, scale_y, fill='black')
+    # Create the two edge points.
+    self._canvas.create_line(
+        scale_x, scale_y - 10, scale_x, scale_y + 10, width=2, fill='black')
+    self._canvas.create_line(scale_x - five_meters, scale_y - 10,
+        scale_x - five_meters, scale_y + 10, width=2, fill='black')
+    # Create the four intermediate smaller lines.
+    for i in range(1, 5):
+      x = scale_x - self._PIXELS_PER_METER * i
+      self._canvas.create_line(x, scale_y - 7, x, scale_y + 7, fill='black')
+    # Create the scale text.
+    self._canvas.create_text(scale_x - five_meters / 2, scale_y + 20,
+        font=self._TEXT_FONT_SMALL, text='5 meters', fill='black')
 
   def _render_user_sim(self):
     """Renders the simulation component to the screen.
