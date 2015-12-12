@@ -16,6 +16,7 @@ class DisplayWindow(object):
   # General display settings.
   _TEXT_FONT = ('Arial', 22)
   _TEXT_FONT_SMALL = ('Arial', 16)
+  _PIXELS_PER_METER = 20 # TODO - don't hard-code this, read from map data file.
   # Display settings for particle filter.
   _PARTICLE_COLOR = 'yellow'
   _PARTICLE_RADIUS = 5
@@ -150,6 +151,7 @@ class DisplayWindow(object):
     if self._background_img:
       self._canvas.create_image(
           0, 0, image=self._background_img, anchor='nw')
+    # Draw the mode text.
     if self._mode == self._SIM_MODE:
       mode_text = 'Simulation Mode'
     else:
@@ -158,6 +160,11 @@ class DisplayWindow(object):
     text_x = self._bmap.num_cols / 2
     self._canvas.create_text(
         text_x, text_y, font=self._TEXT_FONT, text=mode_text, fill='blue')
+    # Draw the scale (pixels to meter).
+    scale_x = self._bmap.num_cols - 20
+    scale_y = self._bmap.num_rows - 20
+    self._canvas.create_line(scale_x, scale_y,
+        scale_x - 5 * self._PIXELS_PER_METER, scale_y, fill='black')
 
   def _render_user_sim(self):
     """Renders the simulation component to the screen.
