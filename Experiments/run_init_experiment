@@ -36,6 +36,7 @@ echo START_X = $startx >> temp_config
 echo START_Y = $starty >> temp_config
 echo START_THETA = $startt >> temp_config
 
+cd ..
 echo 'Initialization at start location:'
 for i in `seq 1 $num_trials`;
 do
