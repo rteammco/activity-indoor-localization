@@ -164,6 +164,7 @@ class Simulation(object):
       for log in self.sim_logs:
         f.write(str(log) + '\n')
       f.close()
+      print 'Wrote output to file "{}".'.format(self._feed_fname)
     except:
       log_error('failed writing to file "{}"'.format(self._feed_fname))
 

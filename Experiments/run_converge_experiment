@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Runs a series of experiments with varying levels of noise on the input feed.
+
+num_trials=10
+
+cnoise=0.25
+mnoise=0.35
+
+filenum=(
+  1
+  2
+  3
+  4
+  5
+  6
+)
+
+cd ..
+for num in ${filenum[@]};
+do
+  exp_file=test_feed_exp$num.txt
+  echo Num: $num \($exp_file\)
+  for i in `seq 1 $num_trials`;
+  do
+    python run.py --config Data/pf_config.txt --feed Data/$exp_file --map-data Data/map.txt --map-image Data/3ne.gif --classifier-noise $cnoise --motion-noise $mnoise --no-disp
+  done
+done
