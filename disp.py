@@ -162,7 +162,7 @@ class DisplayWindow(object):
         text_x, text_y, font=self._TEXT_FONT, text=mode_text, fill='blue')
     # Draw the scale (pixels to meter).
     scale_x = self._bmap.num_cols - 20
-    scale_y = self._bmap.num_rows - 50
+    scale_y = self._bmap.num_rows - 30
     # Create the 5 meter scale line.
     five_meters = 5 * self._PIXELS_PER_METER
     self._canvas.create_line(
