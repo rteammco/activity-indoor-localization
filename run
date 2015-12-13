@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Parameters
-feed_file=Data/test_feed3.txt
+feed_file=Data/test_feed.txt
 config_file=Data/pf_config.txt
 map_file=Data/map.txt
 map_img=Data/3ne.gif
