@@ -1,0 +1,563 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		798C4D351BD452F5009B635E /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 798C4D341BD452F5009B635E /* CoreData.framework */; };
+		798C4D3D1BD456C8009B635E /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798C4D3C1BD456C8009B635E /* DataManager.swift */; };
+		798C4D3F1BD60304009B635E /* DataPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798C4D3E1BD60304009B635E /* DataPoint.swift */; };
+		79AB08D31BF1544B000F93EA /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79AB08D21BF1544B000F93EA /* MapViewController.swift */; };
+		79AB08D51BF1573F000F93EA /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79AB08D41BF1573F000F93EA /* MapKit.framework */; };
+		79D3C2DD1BC760F30060BE69 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D3C2DC1BC760F30060BE69 /* AppDelegate.swift */; };
+		79D3C2DF1BC760F30060BE69 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D3C2DE1BC760F30060BE69 /* ViewController.swift */; };
+		79D3C2E21BC760F30060BE69 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79D3C2E01BC760F30060BE69 /* Main.storyboard */; };
+		79D3C2E51BC760F30060BE69 /* BWI_Sensors.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 79D3C2E31BC760F30060BE69 /* BWI_Sensors.xcdatamodeld */; };
+		79D3C2E71BC760F30060BE69 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79D3C2E61BC760F30060BE69 /* Assets.xcassets */; };
+		79D3C2EA1BC760F30060BE69 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79D3C2E81BC760F30060BE69 /* LaunchScreen.storyboard */; };
+		79D3C2F51BC760F30060BE69 /* BWI_SensorsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D3C2F41BC760F30060BE69 /* BWI_SensorsTests.swift */; };
+		79D3C3001BC760F30060BE69 /* BWI_SensorsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D3C2FF1BC760F30060BE69 /* BWI_SensorsUITests.swift */; };
+		79D3C30E1BC76A4F0060BE69 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79D3C30D1BC76A4F0060BE69 /* CoreMotion.framework */; };
+		79EEAC591BF6F33A003AD2B4 /* AppData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EEAC581BF6F33A003AD2B4 /* AppData.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		79D3C2F11BC760F30060BE69 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 79D3C2D11BC760F20060BE69 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 79D3C2D81BC760F30060BE69;
+			remoteInfo = "BWI Sensors";
+		};
+		79D3C2FC1BC760F30060BE69 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 79D3C2D11BC760F20060BE69 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 79D3C2D81BC760F30060BE69;
+			remoteInfo = "BWI Sensors";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		798C4D341BD452F5009B635E /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		798C4D3C1BD456C8009B635E /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		798C4D3E1BD60304009B635E /* DataPoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataPoint.swift; sourceTree = "<group>"; };
+		79AB08D21BF1544B000F93EA /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		79AB08D41BF1573F000F93EA /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		79D3C2D91BC760F30060BE69 /* BWI Sensors.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BWI Sensors.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		79D3C2DC1BC760F30060BE69 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		79D3C2DE1BC760F30060BE69 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		79D3C2E11BC760F30060BE69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		79D3C2E41BC760F30060BE69 /* BWI_Sensors.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = BWI_Sensors.xcdatamodel; sourceTree = "<group>"; };
+		79D3C2E61BC760F30060BE69 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		79D3C2E91BC760F30060BE69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		79D3C2EB1BC760F30060BE69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		79D3C2F01BC760F30060BE69 /* BWI SensorsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "BWI SensorsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		79D3C2F41BC760F30060BE69 /* BWI_SensorsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWI_SensorsTests.swift; sourceTree = "<group>"; };
+		79D3C2F61BC760F30060BE69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		79D3C2FB1BC760F30060BE69 /* BWI SensorsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "BWI SensorsUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		79D3C2FF1BC760F30060BE69 /* BWI_SensorsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWI_SensorsUITests.swift; sourceTree = "<group>"; };
+		79D3C3011BC760F30060BE69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		79D3C30D1BC76A4F0060BE69 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		79EEAC581BF6F33A003AD2B4 /* AppData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppData.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		79D3C2D61BC760F30060BE69 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79AB08D51BF1573F000F93EA /* MapKit.framework in Frameworks */,
+				798C4D351BD452F5009B635E /* CoreData.framework in Frameworks */,
+				79D3C30E1BC76A4F0060BE69 /* CoreMotion.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		79D3C2ED1BC760F30060BE69 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		79D3C2F81BC760F30060BE69 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		79D3C2D01BC760F20060BE69 = {
+			isa = PBXGroup;
+			children = (
+				79AB08D41BF1573F000F93EA /* MapKit.framework */,
+				798C4D341BD452F5009B635E /* CoreData.framework */,
+				79D3C30D1BC76A4F0060BE69 /* CoreMotion.framework */,
+				79D3C2DB1BC760F30060BE69 /* BWI Sensors */,
+				79D3C2F31BC760F30060BE69 /* BWI SensorsTests */,
+				79D3C2FE1BC760F30060BE69 /* BWI SensorsUITests */,
+				79D3C2DA1BC760F30060BE69 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		79D3C2DA1BC760F30060BE69 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				79D3C2D91BC760F30060BE69 /* BWI Sensors.app */,
+				79D3C2F01BC760F30060BE69 /* BWI SensorsTests.xctest */,
+				79D3C2FB1BC760F30060BE69 /* BWI SensorsUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		79D3C2DB1BC760F30060BE69 /* BWI Sensors */ = {
+			isa = PBXGroup;
+			children = (
+				79D3C2DC1BC760F30060BE69 /* AppDelegate.swift */,
+				79D3C2DE1BC760F30060BE69 /* ViewController.swift */,
+				79AB08D21BF1544B000F93EA /* MapViewController.swift */,
+				798C4D3C1BD456C8009B635E /* DataManager.swift */,
+				79D3C2E01BC760F30060BE69 /* Main.storyboard */,
+				79D3C2E61BC760F30060BE69 /* Assets.xcassets */,
+				79EEAC581BF6F33A003AD2B4 /* AppData.swift */,
+				798C4D3E1BD60304009B635E /* DataPoint.swift */,
+				79D3C2E31BC760F30060BE69 /* BWI_Sensors.xcdatamodeld */,
+				79D3C2E81BC760F30060BE69 /* LaunchScreen.storyboard */,
+				79D3C2EB1BC760F30060BE69 /* Info.plist */,
+			);
+			path = "BWI Sensors";
+			sourceTree = "<group>";
+		};
+		79D3C2F31BC760F30060BE69 /* BWI SensorsTests */ = {
+			isa = PBXGroup;
+			children = (
+				79D3C2F41BC760F30060BE69 /* BWI_SensorsTests.swift */,
+				79D3C2F61BC760F30060BE69 /* Info.plist */,
+			);
+			path = "BWI SensorsTests";
+			sourceTree = "<group>";
+		};
+		79D3C2FE1BC760F30060BE69 /* BWI SensorsUITests */ = {
+			isa = PBXGroup;
+			children = (
+				79D3C2FF1BC760F30060BE69 /* BWI_SensorsUITests.swift */,
+				79D3C3011BC760F30060BE69 /* Info.plist */,
+			);
+			path = "BWI SensorsUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		79D3C2D81BC760F30060BE69 /* BWI Sensors */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79D3C3041BC760F30060BE69 /* Build configuration list for PBXNativeTarget "BWI Sensors" */;
+			buildPhases = (
+				79D3C2D51BC760F30060BE69 /* Sources */,
+				79D3C2D61BC760F30060BE69 /* Frameworks */,
+				79D3C2D71BC760F30060BE69 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BWI Sensors";
+			productName = "BWI Sensors";
+			productReference = 79D3C2D91BC760F30060BE69 /* BWI Sensors.app */;
+			productType = "com.apple.product-type.application";
+		};
+		79D3C2EF1BC760F30060BE69 /* BWI SensorsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79D3C3071BC760F30060BE69 /* Build configuration list for PBXNativeTarget "BWI SensorsTests" */;
+			buildPhases = (
+				79D3C2EC1BC760F30060BE69 /* Sources */,
+				79D3C2ED1BC760F30060BE69 /* Frameworks */,
+				79D3C2EE1BC760F30060BE69 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				79D3C2F21BC760F30060BE69 /* PBXTargetDependency */,
+			);
+			name = "BWI SensorsTests";
+			productName = "BWI SensorsTests";
+			productReference = 79D3C2F01BC760F30060BE69 /* BWI SensorsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		79D3C2FA1BC760F30060BE69 /* BWI SensorsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79D3C30A1BC760F30060BE69 /* Build configuration list for PBXNativeTarget "BWI SensorsUITests" */;
+			buildPhases = (
+				79D3C2F71BC760F30060BE69 /* Sources */,
+				79D3C2F81BC760F30060BE69 /* Frameworks */,
+				79D3C2F91BC760F30060BE69 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				79D3C2FD1BC760F30060BE69 /* PBXTargetDependency */,
+			);
+			name = "BWI SensorsUITests";
+			productName = "BWI SensorsUITests";
+			productReference = 79D3C2FB1BC760F30060BE69 /* BWI SensorsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		79D3C2D11BC760F20060BE69 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = "Richard Teammco";
+				TargetAttributes = {
+					79D3C2D81BC760F30060BE69 = {
+						CreatedOnToolsVersion = 7.0.1;
+						DevelopmentTeam = 39P87EKT4W;
+					};
+					79D3C2EF1BC760F30060BE69 = {
+						CreatedOnToolsVersion = 7.0.1;
+						TestTargetID = 79D3C2D81BC760F30060BE69;
+					};
+					79D3C2FA1BC760F30060BE69 = {
+						CreatedOnToolsVersion = 7.0.1;
+						TestTargetID = 79D3C2D81BC760F30060BE69;
+					};
+				};
+			};
+			buildConfigurationList = 79D3C2D41BC760F20060BE69 /* Build configuration list for PBXProject "BWI Sensors" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 79D3C2D01BC760F20060BE69;
+			productRefGroup = 79D3C2DA1BC760F30060BE69 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				79D3C2D81BC760F30060BE69 /* BWI Sensors */,
+				79D3C2EF1BC760F30060BE69 /* BWI SensorsTests */,
+				79D3C2FA1BC760F30060BE69 /* BWI SensorsUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		79D3C2D71BC760F30060BE69 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79D3C2EA1BC760F30060BE69 /* LaunchScreen.storyboard in Resources */,
+				79D3C2E71BC760F30060BE69 /* Assets.xcassets in Resources */,
+				79D3C2E21BC760F30060BE69 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		79D3C2EE1BC760F30060BE69 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		79D3C2F91BC760F30060BE69 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		79D3C2D51BC760F30060BE69 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79D3C2DF1BC760F30060BE69 /* ViewController.swift in Sources */,
+				79AB08D31BF1544B000F93EA /* MapViewController.swift in Sources */,
+				798C4D3D1BD456C8009B635E /* DataManager.swift in Sources */,
+				798C4D3F1BD60304009B635E /* DataPoint.swift in Sources */,
+				79D3C2DD1BC760F30060BE69 /* AppDelegate.swift in Sources */,
+				79D3C2E51BC760F30060BE69 /* BWI_Sensors.xcdatamodeld in Sources */,
+				79EEAC591BF6F33A003AD2B4 /* AppData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		79D3C2EC1BC760F30060BE69 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79D3C2F51BC760F30060BE69 /* BWI_SensorsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		79D3C2F71BC760F30060BE69 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79D3C3001BC760F30060BE69 /* BWI_SensorsUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		79D3C2F21BC760F30060BE69 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 79D3C2D81BC760F30060BE69 /* BWI Sensors */;
+			targetProxy = 79D3C2F11BC760F30060BE69 /* PBXContainerItemProxy */;
+		};
+		79D3C2FD1BC760F30060BE69 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 79D3C2D81BC760F30060BE69 /* BWI Sensors */;
+			targetProxy = 79D3C2FC1BC760F30060BE69 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		79D3C2E01BC760F30060BE69 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				79D3C2E11BC760F30060BE69 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		79D3C2E81BC760F30060BE69 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				79D3C2E91BC760F30060BE69 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		79D3C3021BC760F30060BE69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		79D3C3031BC760F30060BE69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		79D3C3051BC760F30060BE69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				INFOPLIST_FILE = "BWI Sensors/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "bwi-sensor";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		79D3C3061BC760F30060BE69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				INFOPLIST_FILE = "BWI Sensors/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "bwi-sensor";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		79D3C3081BC760F30060BE69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = "BWI SensorsTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Richard-Teammco.BWI-SensorsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BWI Sensors.app/BWI Sensors";
+			};
+			name = Debug;
+		};
+		79D3C3091BC760F30060BE69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = "BWI SensorsTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Richard-Teammco.BWI-SensorsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BWI Sensors.app/BWI Sensors";
+			};
+			name = Release;
+		};
+		79D3C30B1BC760F30060BE69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "BWI SensorsUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Richard-Teammco.BWI-SensorsUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = "BWI Sensors";
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		79D3C30C1BC760F30060BE69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "BWI SensorsUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Richard-Teammco.BWI-SensorsUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = "BWI Sensors";
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		79D3C2D41BC760F20060BE69 /* Build configuration list for PBXProject "BWI Sensors" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79D3C3021BC760F30060BE69 /* Debug */,
+				79D3C3031BC760F30060BE69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		79D3C3041BC760F30060BE69 /* Build configuration list for PBXNativeTarget "BWI Sensors" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79D3C3051BC760F30060BE69 /* Debug */,
+				79D3C3061BC760F30060BE69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		79D3C3071BC760F30060BE69 /* Build configuration list for PBXNativeTarget "BWI SensorsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79D3C3081BC760F30060BE69 /* Debug */,
+				79D3C3091BC760F30060BE69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		79D3C30A1BC760F30060BE69 /* Build configuration list for PBXNativeTarget "BWI SensorsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79D3C30B1BC760F30060BE69 /* Debug */,
+				79D3C30C1BC760F30060BE69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		79D3C2E31BC760F30060BE69 /* BWI_Sensors.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				79D3C2E41BC760F30060BE69 /* BWI_Sensors.xcdatamodel */,
+			);
+			currentVersion = 79D3C2E41BC760F30060BE69 /* BWI_Sensors.xcdatamodel */;
+			path = BWI_Sensors.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 79D3C2D11BC760F20060BE69 /* Project object */;
+}
